@@ -15,11 +15,12 @@ int main()
 {
 	DeferredApplication d;
 
-	d.init();
+	d.init(1280,720,"NOT SAFE FOR LIFE");
+	system("pause");
 	d.play();
 	d.term();
 
-	system("pause");
+	
 }
 
 

@@ -81,18 +81,27 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep;$(SolutionDir)dep/stb;$(SolutionDir)dep/FBX</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;FBXloader_d.lib</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)dep/FBX;$(SolutionDir)dep</AdditionalLibraryDirectories>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)dep</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)dep;$(SolutionDir)x64/Debug</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -129,11 +138,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\dep\gl_core_4_4.c" />
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dep\FBX\FBXFile.h" />
+    <ClInclude Include="..\dep\gl_core_4_4.h" />
+    <ClInclude Include="..\dep\stb\stb_image.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Vertex.h" />

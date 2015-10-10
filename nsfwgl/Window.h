@@ -11,11 +11,14 @@ No OpenGL!!!
 
 #include <glm/glm.hpp>
 
+struct GLFWwindow;
+
 namespace nsfw
 {
 	class Window
 	{
-		class GLFWWindow *window;
+		GLFWwindow *window;
+		
 		unsigned width, height;		// keep track of width height- needed for glViewport FBO integration
 
 		Window():window(nullptr),width(0),height(0) {}
@@ -30,13 +33,16 @@ namespace nsfw
 
 		// kill the context!
 		void term();
-
+		float deltaTime = 0;
+		float timePassed = 0;
 		// just wrap what GLFW already does
-		float	  getTime()                  const;
-		bool	  getKey(unsigned k)         const;
-		bool	  getShouldClose()           const;
+		void	  SetTime();
+		bool	  getKey(GLFWwindow* window, unsigned int k);
+		bool	  getShouldClose()           ;
 		unsigned  getWidth()                 const;
 		unsigned  getHeight()                const;
+		int key = 0;
+		int action = 0;
 		glm::mat4 getTexelAdjustmentMatrix() const;
 	};
 }
