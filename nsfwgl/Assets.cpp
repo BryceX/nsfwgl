@@ -1,10 +1,9 @@
 #include <gl_core_4_4.h>
 #include <glfw3.h>
 #include <fstream>
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <stb\stb_image.h>
 #include "nsfw.h"
-#include "FBXFile.h"
+#include <FBX\FBXFile.h>
 using namespace nsfw::ASSET;
 
 const char *nsfw::TYPE_NAMES[eSIZE + 1] = { "NONE","vao","ibo","vbo","tri-size","fbo","rbo","texture","shader","SIZE" };
@@ -159,17 +158,33 @@ bool nsfw::Assets::loadTexture(unsigned char * name, const char * path)
 #endif
 	int width=0, height=0, format=0;
 	name = stbi_load(path,&width,&height,&format,STBI_default);
+
+
+	unsigned int m_texture;
+	glGenTextures(1, &m_texture);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, name);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	stbi_image_free(name);
+
+
 	//TODO_D("This should load a texture from a file, using makeTexture to perform the allocation.\nUse STBI, and make sure you switch the format STBI provides to match what openGL needs!");
 	return true;
 }
 unsigned int nsfw::Assets::loadSubShader(unsigned int type, const char* path)
 {
 	std::ifstream in(path);	// opens a inbound-file stream to the file containing the shader source code
-	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());	// load the source code into a std::string object
 
-																									// HEAP		-> dynamically allocated memory (we have lots of this but we have to remember to delete things ourselves)
-																									// STACK	-> memory that variables are normally allocated and deallocated automatically to and frm
-																									// allocate a blank char array in the heap to copy the string into
+	if (!in.is_open())
+	{
+		std::cerr << "Failed to open shader file!" << std::endl;
+		return -1;
+	}
+
+	std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());	// load the source code into a std::string object
 	char *src = new char[contents.length() + 1];
 
 	// copy the string into the char array
@@ -229,7 +244,37 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 
 bool nsfw::Assets::loadFBX(const char * name, const char * path)
 {
-	FBXFile myFBX;
+	Vertex temp;
+	makeVAO(name,&temp,4, /*??????*/);
+	//myFBX.getMeshByName(name);
+	//myFBX.getTextureByName(path);
+
+	myFBX.initialiseOpenGLTextures();
+	myFBX = temp;
+
+	FBXMeshNode * mesh = temp->getMeshByIndex(0);
+	//FBXTexture* texture = temp.getTextureByName(fileName);
+
+	glGenBuffers(1, &myFBX);
+	glGenBuffers(1, &rObject.IBO);
+	glGenVertexArrays(1, &rObject.VAO);
+	glBindVertexArray(rObject.VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, rObject.VBO);
+	glBufferData(GL_ARRAY_BUFFER, mesh->m_vertices.size()*sizeof(FBXVertex), &mesh->m_vertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)(FBXVertex::Offsets::PositionOffset));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)(FBXVertex::Offsets::TexCoord1Offset));
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rObject.IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indices.size()*sizeof(unsigned int), &mesh->m_indices[0], GL_STATIC_DRAW);
+
+	rObject.indexCount = mesh->m_indices.size();
+	glBindVertexArray(0);	// unbind the VAO by setting to zero, which is NULL
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind the IBO
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind the VBO
+
 	//name/meshName
 	//name/textureName
 	TODO_D("FBX file-loading support needed.\nThis function should call loadTexture and makeVAO internally.\nFBX meshes each have their own name, you may use this to name the meshes as they come in.\nMAKE SURE YOU SUPPORT THE DIFFERENCE BETWEEN FBXVERTEX AND YOUR VERTEX STRUCT!\n");
@@ -258,10 +303,10 @@ void nsfw::Assets::init()
 	makeVAO("Cube",CubeVerts,24,CubeTris,36);
 
 	makeVAO("Quad",QuadVerts, 4, QuadTris,6);
-	/*
+	
 	char w[] = { 255,255,255,255 };
 	makeTexture("White", 1, 1, GL_RGB8, w);
-	*/
+	
 
 }
 

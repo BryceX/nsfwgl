@@ -1,5 +1,7 @@
+#include "gl_core_4_4.h"
 #include "nsfw.h"
 #include <glfw3.h>
+
 
 void nsfw::Window::init(unsigned width, unsigned height)
 {
@@ -16,6 +18,13 @@ void nsfw::Window::init(unsigned width, unsigned height)
 	}
 	
 	glfwSetTime(0.0);
+
+	if (ogl_LoadFunctions() == ogl_LOAD_FAILED)
+	{
+		glfwDestroyWindow(window);
+		glfwTerminate();
+		return;
+	}
 }
 
 void nsfw::Window::step()

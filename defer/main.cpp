@@ -18,8 +18,9 @@ int main()
 	d.init(1280,720,"NOT SAFE FOR LIFE");
 	system("pause");
 	d.play();
+	
 	d.term();
-
+	
 	
 }
 
@@ -39,13 +40,13 @@ void DeferredApplication::onInit()
 	a.makeFBO("LightPass", w.getWidth(), w.getHeight(), 1, lpassTextureNames, lpassDepths); 
 
 	// Load Shaders
-	a.loadShader("GeometryPassPhong", "/path/to/gpass/Phong/vertex", "/path/to/gpass/Phong/fragment");
-	a.loadShader("LightPassDirectional", "/path/to/lpass/Directional/vertex", "/path/to/lpass/Directional/fragment");
+	a.loadShader("GeometryPassPhong", "testVert.txt", "testFrag.txt");
+	//a.loadShader("LightPassDirectional", "/path/to/lpass/Directional/vertex", "/path/to/lpass/Directional/fragment");
 	//a.loadShader("LightPassPoint", "/path/to/lpass/Point/vertex", "/path/to/lpass/Point/fragment");
-	a.loadShader("CompPass", "/path/to/cpass/vertex", "/path/to/cpass/fragment");
+//	a.loadShader("CompPass", "/path/to/cpass/vertex", "/path/to/cpass/fragment");
 
 	// Load any other textures and geometry we want to use
-	a.loadFBX("Soulspear", "/path/to/souuuulspppeeeeaaar");
+	//a.loadFBX("Soulspear", "/path/to/souuuulspppeeeeaaar");
 }
 
 void DeferredApplication::onPlay()
