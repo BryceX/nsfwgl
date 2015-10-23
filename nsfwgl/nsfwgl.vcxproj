@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,6 +139,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\dep\gl_core_4_4.c" />
+    <ClCompile Include="..\dep\TinyOBJ\tiny_obj_loader.cc" />
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="render.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="..\dep\FBX\FBXFile.h" />
     <ClInclude Include="..\dep\gl_core_4_4.h" />
     <ClInclude Include="..\dep\stb\stb_image.h" />
+    <ClInclude Include="..\dep\TinyOBJ\tiny_obj_loader.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Vertex.h" />

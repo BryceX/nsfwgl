@@ -13,12 +13,13 @@ using namespace nsfw;
 
 int main()
 {
+
 	DeferredApplication d;
 
 	d.init(1280,720,"NOT SAFE FOR LIFE");
-	system("pause");
-	d.play();
 	
+	d.play();
+	system("pause");
 	d.term();
 	
 	
@@ -58,7 +59,7 @@ void DeferredApplication::onPlay()
 
 	m_camera->lookAt(glm::vec3(10), glm::vec3(0), glm::vec3(0,1,0));
 
-	m_light->color      = glm::vec3(1, 1, 1);
+	m_light->color      = glm::vec3(0, 1, 1);
 	m_light->direction = glm::normalize(glm::vec3(1, 1, 0));
 
 	m_soulspear->mesh	   = "Soulspear";
@@ -74,6 +75,9 @@ void DeferredApplication::onPlay()
 	m_geometryPass			= new GPass ("GeometryPassPhong", "GeometryPass");
 	m_directionalLightPass  = new LPassD("LightPassDirectional", "LightPass");
 	m_compositePass			= new CPass ("CompPass", "Screen"); // Screen is defined in nsfw::Assets::init()
+	
+	
+	
 }
 
 void DeferredApplication::onStep()

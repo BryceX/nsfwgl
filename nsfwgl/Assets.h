@@ -77,7 +77,8 @@ namespace nsfw
 	*/
 	class Assets
 	{
-	private:
+	//private:
+	public:
 		// Hashing functor object for accepting pair<enum,string> as an index.
 		struct Hash { size_t operator()(AssetKey k) const { return std::hash<std::string>()(k.second) + (unsigned)k.first; } };
 		

@@ -27,6 +27,9 @@
     <ClCompile Include="..\dep\gl_core_4_4.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\dep\TinyOBJ\tiny_obj_loader.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets.h">
@@ -47,14 +50,17 @@
     <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\dep\gl_core_4_4.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="..\dep\TinyOBJ\tiny_obj_loader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\dep\stb\stb_image.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="..\dep\gl_core_4_4.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\dep\FBX\FBXFile.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\dep\stb\stb_image.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
