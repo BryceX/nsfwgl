@@ -1,21 +1,24 @@
 #pragma once
 
-
+#include "ForwardPass.h"
 #include "nsfw.h"
 #include "Camera.h"
 #include "GameObject.h"
-#include "ForwardPass.h"
 
-class TestApp :public nsfw::Application
+
+class TestApp : public nsfw::Application
 {
 	Camera camera;
 	GameObject gameObject;
 	ForwardPass forwardPass;
 
 public:
-	void OnStep();
-	void OnPlay();
-	void OnInit();
-	void OnTerm();
+	TestApp() {};
+	virtual ~TestApp() override {};
+
+	void onStep() override;
+	void onPlay() override;
+	void onInit() override;
+	void onTerm() override;
 
 };

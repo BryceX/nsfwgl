@@ -1,5 +1,7 @@
 #version 410
 
+in vec2 vTexCoord;	// came from the vertex shader!
+
 out vec4 FragColor;
 
 void main()

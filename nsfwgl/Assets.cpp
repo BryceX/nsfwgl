@@ -63,20 +63,30 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	ASSET_LOG(GL_HANDLE_TYPE::SIZE);
 	GLuint vao, vbo, ibo;
 
-	glGenBuffers(1, &vao);	// generate the VAO
-	glBindVertexArray(vao);
-
+	glGenVertexArrays (1, &vao);	// generate the VAO
 	glGenBuffers(1,&vbo);	// generate the VBO
+	glGenBuffers(1, &ibo);	// generate the IBO
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// bind the IBO
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);	// bind the VBO
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vsize, verts, GL_STATIC_DRAW); // buffer the VBO
-	glEnableVertexAttribArray(0);  // specify the attributes for the VBO
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE,	sizeof(Vertex), 0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(float) * 4));
 
-	glGenBuffers(1, &ibo);	// generate the IBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// bind the IBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vsize, verts, GL_STATIC_DRAW); // buffer the VBO
+
+	// specify the attributes for the VBO
+	glEnableVertexAttribArray(0);	// pos
+	glEnableVertexAttribArray(1);	// normal
+	glEnableVertexAttribArray(2);	// tangent
+	glEnableVertexAttribArray(3);	// texcoord
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
+
+	
+	
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tsize, tris, GL_STATIC_DRAW); // buffer the IBO
 
 	glBindVertexArray(0); // unbind the VAO
@@ -93,7 +103,7 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	return true;
 }
 
-bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned nTextures, const char * names[], const unsigned depths[])
+bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned nTextures, const unsigned char * names[], const unsigned depths[])
 {
 
 #if _DEBUG
@@ -132,7 +142,7 @@ bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned n
 	return true;
 }
 
-bool nsfw::Assets::makeTexture(const char * name, unsigned w, unsigned h, unsigned depth, const char *pixels)
+bool nsfw::Assets::makeTexture(const char * name, unsigned w, unsigned h, unsigned depth, const unsigned char *pixels)
 {
 #if _DEBUG
 	// check if the data is valid
@@ -158,7 +168,7 @@ bool nsfw::Assets::makeTexture(const char * name, unsigned w, unsigned h, unsign
 	return true;
 }
 
-bool nsfw::Assets::loadTexture(unsigned char * name, const char * path)
+bool nsfw::Assets::loadTexture(const char * name, const char * path)
 {
 #if _DEBUG
 	// check if the data is valid
@@ -168,8 +178,9 @@ bool nsfw::Assets::loadTexture(unsigned char * name, const char * path)
 		return false;
 	}
 #endif
+	unsigned char* data;
 	int width=0, height=0, format=0;
-	name = stbi_load(path,&width,&height,&format,STBI_default);
+	data = stbi_load(path,&width,&height,&format,STBI_default);
 
 
 	unsigned int m_texture;
@@ -180,7 +191,7 @@ bool nsfw::Assets::loadTexture(unsigned char * name, const char * path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	stbi_image_free(name);
+	stbi_image_free(&name);
 
 
 	//TODO_D("This should load a texture from a file, using makeTexture to perform the allocation.\nUse STBI, and make sure you switch the format STBI provides to match what openGL needs!");
@@ -227,8 +238,12 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 
 	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
 	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(vShader, 1, (const char**)vcontents.c_str(), 0);
-	glShaderSource(fShader, 1, (const char**)fcontents.c_str(), 0);
+
+	const char *vs = vcontents.c_str();
+	const char *fs = fcontents.c_str();
+
+	glShaderSource(vShader, 1, &vs, 0);
+	glShaderSource(fShader, 1, &fs, 0);
 	glCompileShader(vShader);
 	glCompileShader(fShader);
 	glAttachShader(shader, vShader);
@@ -237,12 +252,7 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 	glDeleteShader(vShader);
 	glDeleteShader(fShader);
 
-	//unsigned programID = glCreateProgram();	// store handle to generated shader program
-	//unsigned vshader = loadSubShader(GL_VERTEX_SHADER, vpath);
-	//unsigned fshader = loadSubShader(GL_FRAGMENT_SHADER, fpath);
-	//glAttachShader(programID, vshader);
-	//glAttachShader(programID, fshader);
-	//glLinkProgram(programID);
+
 	int success;
 
 	glGetProgramiv(shader, GL_LINK_STATUS, &success);
@@ -256,7 +266,7 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 		printf("%s\n", infoLog);
 		delete[] infoLog;
 	}
-	setINTERNAL(GL_HANDLE_TYPE::TEXTURE, name, shader);
+	setINTERNAL(GL_HANDLE_TYPE::SHADER, name, shader);
 
 
 	//TODO_D("Load shader from a file.");
@@ -274,6 +284,8 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 	}
 #endif
 
+	TODO_D("This should only create an array of Vertex objects that are passed into makeVAO!");
+
 	Vertex temp;
 	FBXFile myFBX;
 	myFBX.load(name);
@@ -284,18 +296,27 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 	FBXMeshNode * mesh = myFBX.getMeshByIndex(0);
 	//FBXTexture* texture = temp.getTextureByName(fileName);
 
+	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &IBO);
-	glGenVertexArrays(1, &VAO);
+	
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, mesh->m_vertices.size()*sizeof(FBXVertex), &mesh->m_vertices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)(FBXVertex::Offsets::PositionOffset));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(FBXVertex), (void*)(FBXVertex::Offsets::TexCoord1Offset));
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+
+	glBufferData(GL_ARRAY_BUFFER, mesh->m_vertices.size()*sizeof(Vertex), &mesh->m_vertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);	// Position
+	glEnableVertexAttribArray(1);	// normal
+	glEnableVertexAttribArray(2); //tangent
+	glEnableVertexAttribArray(3);//texcoord
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
+
+	
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indices.size()*sizeof(unsigned int), &mesh->m_indices[0], GL_STATIC_DRAW);
 
 	//rObject.indexCount = mesh->m_indices.size();
@@ -411,7 +432,7 @@ void nsfw::Assets::init()
 	//unsigned temp = loadFBX("cube.fbx", "$(SolutionDir)FBX\cube.fbx");
 	makeVAO("Quad",QuadVerts, 4, QuadTris,6);
 	
-	char w[] = { 255,255,255,255 };
+	unsigned char w[] = { 255,255,255,255 };
 	makeTexture("White", 1, 1, GL_RGBA, w);
 	
 

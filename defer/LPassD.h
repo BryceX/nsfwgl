@@ -6,8 +6,6 @@
 class LPassD : public nsfw::RenderPass
 {
 public:
-	LPassD(const char *shaderName, const char *fboName) : RenderPass(shaderName, fboName) {}
-
 	void prep() { TODO_D("glUseProgram, glClear, glBindFrameBuffer, glViewPort, glEnable etc..."); }
 	void post() { TODO_D("Unset any gl settings"); }
 

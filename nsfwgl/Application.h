@@ -7,6 +7,10 @@ namespace nsfw
 	class Application
 	{
 	public:
+		Application() {}
+		virtual ~Application() {}
+
+		// THESE NEED TO BE OVERRIDEN THE CHILD CLASS
 		virtual void onInit() { TODO_D("OVERRIDE: Load everything here!"); };
 		virtual void onTerm() { TODO_D("OVERRIDE: Free your data!"); };
 		virtual void onPlay() { TODO_D("OVERRIDE: Setup/reset the game state (or do nothing)!"); };

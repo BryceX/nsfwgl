@@ -1,10 +1,12 @@
 #include "testApp.h"
 
-TestApp temp;
-
-
 int main() 
 {
-	temp.OnPlay();
+	TestApp temp;
+
+	temp.init();
+	temp.play();
+	temp.term();
+
 	system("PAUSE");
 }

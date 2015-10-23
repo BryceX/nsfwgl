@@ -6,7 +6,7 @@ struct Camera
 {
 	glm::mat4 transform;
 	float mnear, mfar, maspect, mfov;
-	Camera() :mnear(0), mfar(100), maspect(nsfw::Window::instance().getWidth() / (float)nsfw::Window::instance().getHeight()), mfov(90) {}
+	Camera() :mnear(0.1), mfar(100), maspect(nsfw::Window::instance().getWidth() / (float)nsfw::Window::instance().getHeight()), mfov(90) {}
 	void update() {}
 	void lookAt(glm::vec3 pos, glm::vec3 target, glm::vec3 up) 
 	{

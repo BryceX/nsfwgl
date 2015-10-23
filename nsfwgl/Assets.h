@@ -117,13 +117,13 @@ namespace nsfw
 		bool makeVAO(const char *name, const struct Vertex *verts, unsigned vsize, const unsigned *tris, unsigned tsize);
 
 		// should call makeTexture nTextures number of times
-		bool makeFBO(const char *name, unsigned w, unsigned h, unsigned nTextures, const char *names[], const unsigned depths[]);
+		bool makeFBO(const char *name, unsigned w, unsigned h, unsigned nTextures, const unsigned char *names[], const unsigned depths[]);
 
 		// should allocate space for a texture, but not necessarily set its data
-		bool makeTexture(const char *name, unsigned w, unsigned h, unsigned depth, const char *pixels = nullptr);
+		bool makeTexture(const char *name, unsigned w, unsigned h, unsigned depth, const unsigned char *pixels = nullptr);
 
 		// should load a texture from a file, use makeTexture to alloc, and then copy filedata in
-		bool loadTexture(unsigned char *name, const char *path);
+		bool loadTexture(const char *name, const char *path);
 	
 		unsigned int loadSubShader( unsigned int type, const char* path);
 
