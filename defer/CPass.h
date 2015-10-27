@@ -11,7 +11,7 @@ class CPass : public nsfw::RenderPass
 public:
 											
 	CPass(const char *shaderName, const char *fboName) 
-						  : RenderPass(shaderName, fboName), albedo("GPassAlbedo"), position("GPassPosition"), // NAMES ARE FROM ASSET LIBRARY!
+						  : RenderPass(), albedo("GPassAlbedo"), position("GPassPosition"), // NAMES ARE FROM ASSET LIBRARY!
 											    normal("GPassNormal"),depth("GPassDepth"), light("LPassColor")
 												 {}
 

@@ -288,7 +288,25 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 
 	Vertex temp;
 	FBXFile myFBX;
-	myFBX.load(name);
+	bool status = myFBX.load(path);
+
+	assert(status == true);	// I AM ASSERTING THAT THIS EXPRESSION IS TRUE
+							// 
+							// IF THIS EXPRESSION IS FALSE, STOP WHAT YOU ARE DOING
+
+	if (status == false)
+	{
+		// there are multiple streams
+		//
+		// std::cout -- goes to stdout, just general console output
+		// std::cerr -- goes to stderr, reserved for reporting errors, still goes to console
+		// std::cin  -- goes to stdin, for accepting user input
+		std::cerr << "FBX file failed to load." << std::endl;
+
+		
+		return false;	// exit early
+	}
+
 	unsigned int VAO, VBO, IBO;
 	makeVAO(name,&temp,4, CubeTris,6);
 	myFBX.initialiseOpenGLTextures();
