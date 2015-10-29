@@ -11,9 +11,8 @@ uniform mat4 Projection;	// camera's projection matrix (how the world is perciev
 uniform mat4 View;			// camera's view matrix (where it's looking at)
 uniform mat4 Model;			// model matrix -- this is your transform
 
-uniform mat4 Diffuse;		// texture
-
 void main()
 {
+	vTexCoord = TexCoord;
     gl_Position = Projection * View * Model * Position;
 }

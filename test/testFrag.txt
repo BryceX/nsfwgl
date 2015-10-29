@@ -4,7 +4,10 @@ in vec2 vTexCoord;	// came from the vertex shader!
 
 out vec4 FragColor;
 
+uniform sampler2D Diffuse;		// texture
+
 void main()
 {	
-   FragColor = vec4(0.4, 0.0, 0.4, 1);
+   //FragColor = vec4(0.4, 0.0, 0.4, 1);
+   FragColor = vec4(texture(Diffuse, vTexCoord).xyz, 1);
 }

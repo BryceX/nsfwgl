@@ -4,7 +4,7 @@ void TestApp::onInit()
 {
 	nsfw::Assets::instance().loadShader("Basic", "testVert.txt",
 		"testFrag.txt");
-
+	nsfw::Assets::instance().loadFBX("Sphere", "../FBX/sphere.fbx");
 //	nsfw::Assets::instance().loadTexture("Purple", "../resources/textures/purple.png");
 }
 
@@ -17,9 +17,8 @@ void TestApp::onPlay()
 	// initialize my gameObject
 	gameObject.transform = glm::mat4(1);
 	gameObject.diffuse = "White";
-	gameObject.mesh = "Quad";
-	gameObject.tris = "Quad";
-	
+	gameObject.mesh = "Sphere";
+	gameObject.tris = "Sphere";
 	// initialize my forward pass
 	forwardPass.shader = "Basic";
 	forwardPass.fbo = "Screen";
@@ -28,7 +27,7 @@ void TestApp::onPlay()
 void TestApp::onStep()
 {
 	float time = nsfw::Window::instance().timePassed;
-	gameObject.transform = glm::rotate(time * 10, glm::vec3(0, 1, 0));
+	//gameObject.transform = glm::rotate(time * 10, glm::vec3(0, 1, 0));
 
 	forwardPass.prep();
 	forwardPass.draw(camera, gameObject);

@@ -5,6 +5,8 @@
 #include "nsfw.h"
 #include <FBX\FBXFile.h>
 #include <TinyOBJ\tiny_obj_loader.h>
+#include <vector>
+using std::vector;
 using namespace nsfw::ASSET;
 
 const char *nsfw::TYPE_NAMES[eSIZE + 1] = { "NONE","vao","ibo","vbo","tri-size","fbo","rbo","texture","shader","SIZE" };
@@ -162,7 +164,10 @@ bool nsfw::Assets::makeTexture(const char * name, unsigned w, unsigned h, unsign
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);// specify min filter
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);// specify max filter
 	glBindTexture(GL_TEXTURE_2D, 0);		// unbind the texture
-	setINTERNAL(GL_HANDLE_TYPE::TEXTURE, name, depth);	// deliver this to the assman
+	setINTERNAL(GL_HANDLE_TYPE::TEXTURE, name, texHandle);	// deliver this to the assman
+															// TODO: find out if this works
+															// HACK: this probably doesn't work
+															// CONSIDER: does this actually work?
 
 	//TODO_D("Allocate a texture using the given space/dimensions. Should work if 'pixels' is null, so that you can use this same function with makeFBO\n note that Dept will use a GL value.");
 	return true;
@@ -275,6 +280,13 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 
 bool nsfw::Assets::loadFBX(const char * name, const char * path)
 {
+	// TODO List for loadFBX
+	//	OK	1. Load in the FBX file at the specified path
+	//		2. Create an array of verticies using our Vertex data structure
+	//		3. Create an array of indicies using unsigned integers
+	//		4. Pass those arrays into the makeVAO function
+	//		5. Return a boolean stating whether or not we were able to successfully load the FBX files into OpenGL
+
 #if _DEBUG
 	// check if the data is valid
 	if (name == nullptr)
@@ -283,17 +295,12 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 		return false;
 	}
 #endif
-
-	TODO_D("This should only create an array of Vertex objects that are passed into makeVAO!");
-
-	Vertex temp;
 	FBXFile myFBX;
 	bool status = myFBX.load(path);
 
 	assert(status == true);	// I AM ASSERTING THAT THIS EXPRESSION IS TRUE
 							// 
 							// IF THIS EXPRESSION IS FALSE, STOP WHAT YOU ARE DOING
-
 	if (status == false)
 	{
 		// there are multiple streams
@@ -303,48 +310,24 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 		// std::cin  -- goes to stdin, for accepting user input
 		std::cerr << "FBX file failed to load." << std::endl;
 
-		
 		return false;	// exit early
 	}
-
-	unsigned int VAO, VBO, IBO;
-	makeVAO(name,&temp,4, CubeTris,6);
 	myFBX.initialiseOpenGLTextures();
-
 	FBXMeshNode * mesh = myFBX.getMeshByIndex(0);
-	//FBXTexture* texture = temp.getTextureByName(fileName);
+	vector<Vertex> FBXVertices;
+	FBXVertices.reserve(mesh->m_vertices.size());
+	for (int currentVertex = 0; currentVertex < mesh->m_vertices.size();++currentVertex)
+	{
+		Vertex tempVert;
+		tempVert.position = mesh->m_vertices[currentVertex].position; // makes our vposition in the vertex structure = to the position in the fbx mesh
+		tempVert.tangent = mesh->m_vertices[currentVertex].tangent;
+		tempVert.normal = mesh->m_vertices[currentVertex].normal;
+		tempVert.texCoord = mesh->m_vertices[currentVertex].texCoord1;
+		FBXVertices.push_back(tempVert);
+	}
 
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &IBO);
-	
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-
-	glBufferData(GL_ARRAY_BUFFER, mesh->m_vertices.size()*sizeof(Vertex), &mesh->m_vertices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);	// Position
-	glEnableVertexAttribArray(1);	// normal
-	glEnableVertexAttribArray(2); //tangent
-	glEnableVertexAttribArray(3);//texcoord
-
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
-
-	
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->m_indices.size()*sizeof(unsigned int), &mesh->m_indices[0], GL_STATIC_DRAW);
-
-	//rObject.indexCount = mesh->m_indices.size();
-	glBindVertexArray(0);	// unbind the VAO by setting to zero, which is NULL
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind the IBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind the VBO
-
-	//name/meshName
-	//name/textureName
-	TODO_D("FBX file-loading support needed.\nThis function should call loadTexture and makeVAO internally.\nFBX meshes each have their own name, you may use this to name the meshes as they come in.\nMAKE SURE YOU SUPPORT THE DIFFERENCE BETWEEN FBXVERTEX AND YOUR VERTEX STRUCT!\n");
+	makeVAO(name, FBXVertices.data(), FBXVertices.size(), mesh->m_indices.data(), mesh->m_indices.size());
+	//TODO_D("FBX file-loading support needed.\nThis function should call loadTexture and makeVAO internally.\nFBX meshes each have their own name, you may use this to name the meshes as they come in.\nMAKE SURE YOU SUPPORT THE DIFFERENCE BETWEEN FBXVERTEX AND YOUR VERTEX STRUCT!\n");
 	return true;
 }
 
@@ -446,8 +429,7 @@ void nsfw::Assets::init()
 	setINTERNAL(FBO,"Screen",0);
 	
 	makeVAO("Cube",CubeVerts,24,CubeTris,36);
-	//unsigned bunny = loadOBJ("bunny.obj", "$(SolutionDir)OBJ\bunny.obj");
-	//unsigned temp = loadFBX("cube.fbx", "$(SolutionDir)FBX\cube.fbx");
+
 	makeVAO("Quad",QuadVerts, 4, QuadTris,6);
 	
 	unsigned char w[] = { 255,255,255,255 };
