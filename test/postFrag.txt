@@ -1,0 +1,10 @@
+#version 410
+
+in vec2 vTexCoord;
+
+uniform sampler2D Diffuse;	// result of the fwd pass
+
+void main()
+{
+	gl_FragColor = texture(Diffuse, vTexCoord);
+}

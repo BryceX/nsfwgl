@@ -11,6 +11,7 @@ class ForwardPass : public nsfw::RenderPass
 public:
 	void prep()
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, *fbo);
 		glUseProgram(*shader);
 		glClearColor(0.25f, 0.25f, 0.25f, 1);
 		glEnable(GL_DEPTH_TEST);
@@ -20,6 +21,7 @@ public:
 
 	void post()
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_CULL_FACE);
 		glUseProgram(0);

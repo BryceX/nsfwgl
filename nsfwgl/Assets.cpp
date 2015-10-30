@@ -6,6 +6,7 @@
 #include <FBX\FBXFile.h>
 #include <TinyOBJ\tiny_obj_loader.h>
 #include <vector>
+
 using std::vector;
 using namespace nsfw::ASSET;
 
@@ -103,8 +104,17 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	return true;
 }
 
-bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned nTextures, const unsigned char * names[], const unsigned depths[])
+bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned nTextures, const char * names[], const unsigned depths[])
 {
+	// 1. Generate and bind the FBO
+	// 2. Iterate over the textures for the FBO
+	//		a. generate a texture for it
+	//		b. determine what kind of attachment it is
+	//		c. attach it to the framebuffer
+	// 3. Provide a listing of the color attachments we're using
+	// 4. Add the newly created FBO to the asset manager
+	//		a. Unbind the FBO
+	// 5. Return a bool, indicating whether or not we successfully created an FBO object
 
 #if _DEBUG
 	// check if the data is valid
@@ -116,29 +126,52 @@ bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned n
 #endif
 	ASSET_LOG(GL_HANDLE_TYPE::FBO);
 
-	GLuint fbo;
+	GLuint fbo;	// stores a handle (what OpenGL refers to as a "name") to our FBO
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 	int nColors = 0;
-	for (int i = 0; i < nTextures; i++)
+	for (int i = 0; i < nTextures; ++i)
 	{
-		makeTexture(name, w, h, depths[i], names[i]);
-		unsigned attachment;
-		if (depths[i] == GL_DEPTH_COMPONENT)attachment = GL_DEPTH_ATTACHMENT;
-		else if (depths[i] == GL_DEPTH_STENCIL)attachment = GL_STENCIL_ATTACHMENT;
-		else attachment = GL_COLOR_ATTACHMENT0 + nColors++;
+		makeTexture(names[i], w, h, depths[i]);
+		unsigned Attachment;
+		if (depths[i] == GL_DEPTH_COMPONENT)		// GL_DEPTH_COMPONENT	-> GL_DEPTH_ATTACHMENT
+		{
+			Attachment = GL_DEPTH_ATTACHMENT;
+		}
+		else if (depths[i] == GL_DEPTH_STENCIL)
+		{
+			Attachment = GL_STENCIL_ATTACHMENT;		// GL_DEPTH_STENCIL		->	GL_STENCIL_ATTACHMENT
+		}
+		else
+		{
+			Attachment = GL_COLOR_ATTACHMENT0 + nColors++;	// 
+		}
+
+		glFramebufferTexture(GL_FRAMEBUFFER, Attachment, get<TEXTURE>(names[i]), 0);
 	}
 
-	GLenum* colorAttachments = new GLenum[nColors];
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		printf("Framebuffer Error!\n");
+
+		// ABORT ABORT ABORT
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteFramebuffers(1, &fbo);			// clean up
+		return false;
+	}
+	
+	GLenum *colorAttachments = new GLenum[nColors];
 	for (int i = 0; i < nColors; ++i)
 	{
-		glDrawBuffers(nColors, colorAttachments);
+		colorAttachments[i] = GL_COLOR_ATTACHMENT0 + i;
 	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	setINTERNAL(GL_HANDLE_TYPE::FBO, name, nTextures);
+	glDrawBuffers(nColors, colorAttachments);
+	delete[] colorAttachments;
 	
-	//TODO_D("Create an FBO! Array parameters are for the render targets, which this function should also generate!\nuse makeTexture.\nNOTE THAT THERE IS NO FUNCTION SETUP FOR MAKING RENDER BUFFER OBJECTS.");
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	setINTERNAL(FBO, name, fbo);
 	return true;
 }
 
@@ -179,7 +212,7 @@ bool nsfw::Assets::loadTexture(const char * name, const char * path)
 
 #if _DEBUG
 	// check if the data is valid
-	if (path == nullptr)
+	if (name == nullptr)
 	{
 		std::cout << "ERROR: Texture data is null!" << std::endl;
 		return false;
@@ -332,88 +365,45 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 	return true;
 }
 
-bool nsfw::Assets::loadOBJ(const char * name, const char * path)
+bool nsfw::Assets::loadOBJ(const char * name, const char * path)//fucked up
 {
-	unsigned int m_program_id = 0;
-	glUseProgram(m_program_id);
-	int view_proj_uniform = glGetUniformLocation(m_program_id, "projection_view");
-	typedef struct
+	// 1. Load the obj file
+	// 2. Load the tinyObj data into our Vertex data
+	// 3. Pass that information into makeVAO
+	// 4. Return true if we successfully loaded the file, otherwise return false
+	assert(false);
+#if _DEBUG
+	// check if the data is valid
+	if (name == nullptr)
 	{
-		std::vector<float> positions;
-		std::vector<float> normals;
-		std::vector<float> texcoords;
-		std::vector<unsigned int> indices;
-		std::vector<int> material_ids;
-	} mesh_t;
-	typedef struct
-	{
-		std::string name;
-		mesh_t mesh;
-	} shape_t;
-
+		std::cout << "ERROR: FBX data is null!" << std::endl;
+		return false;
+	}
+#endif
 
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 
-	std::string object = tinyobj::LoadObj(shapes, materials,name);
+	std::string object = tinyobj::LoadObj(shapes, materials,path);
 
-	struct OpenGLInfo
-	{
-		unsigned int m_VAO;
-		unsigned int m_VBO;
-		unsigned int m_IBO;
-		unsigned int m_index_count;
-	};
-	std::vector<OpenGLInfo> m_gl_info;
+	std::vector<Vertex> vertices;
 
 	for (unsigned int mesh_index = 0;mesh_index < shapes.size();++mesh_index)
 	{
-		glGenVertexArrays(1, &m_gl_info[mesh_index].m_VAO);
-		glGenBuffers(1, &m_gl_info[mesh_index].m_VBO);
-		glGenBuffers(1, &m_gl_info[mesh_index].m_IBO);
-		glBindVertexArray(m_gl_info[mesh_index].m_VAO);
 		unsigned int float_count = shapes[mesh_index].mesh.positions.size();
 		float_count += shapes[mesh_index].mesh.normals.size();
 		float_count += shapes[mesh_index].mesh.texcoords.size();
 		std::vector<float> vertex_data;
 		vertex_data.reserve(float_count);
-		vertex_data.insert(vertex_data.end(),
-			shapes[mesh_index].mesh.positions.begin(),
-			shapes[mesh_index].mesh.positions.end());
-		vertex_data.insert(vertex_data.end(),
-			shapes[mesh_index].mesh.normals.begin(),
-			shapes[mesh_index].mesh.normals.end());
-		m_gl_info[mesh_index].m_index_count =
-			shapes[mesh_index].mesh.indices.size();
-		glBindBuffer(GL_ARRAY_BUFFER, m_gl_info[mesh_index].m_VBO);
-		glBufferData(GL_ARRAY_BUFFER,
-			vertex_data.size() * sizeof(float),
-			vertex_data.data(), GL_STATIC_DRAW);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_gl_info[mesh_index].m_IBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			shapes[mesh_index].mesh.indices.size() * sizeof(unsigned int),
-			shapes[mesh_index].mesh.indices.data(), GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0); //position
-		glEnableVertexAttribArray(1); //normal data
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_TRUE, 0,
-			(void*)(sizeof(float)*shapes[mesh_index].mesh.positions.size()));
-		glBindVertexArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-	
-	//glUniformMatrix4fv(view_proj_uniform, 1, GL_FALSE, (float*)&m_camera.view_proj);
-	for (unsigned int i = 0; i < m_gl_info.size(); ++i)
-	{
-		glBindVertexArray(m_gl_info[i].m_VAO);
-		glDrawElements(GL_TRIANGLES, m_gl_info[i].m_index_count, GL_UNSIGNED_INT, 0);
+		vertex_data.insert(vertex_data.end(),shapes[mesh_index].mesh.positions.begin(),	shapes[mesh_index].mesh.positions.end());
+		vertex_data.insert(vertex_data.end(),shapes[mesh_index].mesh.normals.begin(), shapes[mesh_index].mesh.normals.end());
 	}
 
+	//makevao
+	makeVAO(name, vertices.data(), vertices.size(), shapes[0].mesh.indices.data(), shapes[0].mesh.indices.size());
 
-
-	TODO_D("OBJ file-loading support needed.\nThis function should call makeVAO and loadTexture (if necessary), MAKE SURE TO TAKE THE OBJ DATA AND PROPERLY LINE IT UP WITH YOUR VERTEX ATTRIBUTES (or interleave the data into your vertex struct).\n");
-	return false;
+	//TODO_D("OBJ file-loading support needed.\nThis function should call makeVAO and loadTexture (if necessary), MAKE SURE TO TAKE THE OBJ DATA AND PROPERLY LINE IT UP WITH YOUR VERTEX ATTRIBUTES (or interleave the data into your vertex struct).\n");
+	return true;
 }
 
 void nsfw::Assets::init()

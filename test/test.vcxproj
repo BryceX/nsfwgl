@@ -130,6 +130,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ForwardPass.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="PostProcPass.h" />
     <ClInclude Include="testApp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
