@@ -2,9 +2,24 @@
 
 in vec2 vTexCoord;
 
+out vec4 FragColor;
+
 uniform sampler2D Diffuse;	// result of the fwd pass
+vec4 Distort() 
+{
+vec2 mid = vec2(0.5f);
+float distanceFromCentre = distance(vTexCoord, mid);
+vec2 normalizedCoord = normalize(vTexCoord - mid);
+float bias = distanceFromCentre +
+sin(distanceFromCentre * 15) * 0.02f;
+vec2 newCoord = mid + bias * normalizedCoord;
+return texture(Diffuse, newCoord);
+}
 
 void main()
 {
-	gl_FragColor = texture(Diffuse, vTexCoord);
+	//fragColor = texture(0.5f, 0.5f);
+
+	//FragColor = texture(Diffuse, vTexCoord);
+	FragColor = Distort();
 }
