@@ -83,11 +83,9 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	glEnableVertexAttribArray(3);	// texcoord
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
-
-	
 	
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tsize, tris, GL_STATIC_DRAW); // buffer the IBO
 
@@ -175,6 +173,10 @@ bool nsfw::Assets::makeTexture(const char * name, unsigned w, unsigned h, unsign
 
 bool nsfw::Assets::loadTexture(const char * name, const char * path)
 {
+	// 1. Load a texture from file
+	// 2. Feed texture data into makeTexture
+	// 3. Returning whether or not we successfully loaded the texture into OpenGL
+
 #if _DEBUG
 	// check if the data is valid
 	if (path == nullptr)
@@ -183,20 +185,19 @@ bool nsfw::Assets::loadTexture(const char * name, const char * path)
 		return false;
 	}
 #endif
-	unsigned char* data;
-	int width=0, height=0, format=0;
-	data = stbi_load(path,&width,&height,&format,STBI_default);
+	int width = 0, height = 0, format = 0;
+	unsigned char* data = stbi_load(path, &width, &height, &format, STBI_default);
 
+	switch (format)
+	{
+	case STBI_grey:			format = GL_RED;	break;
+	case STBI_grey_alpha:	format = GL_RG;		break;
+	case STBI_rgb:			format = GL_RGB;	break;
+	case STBI_rgb_alpha:	format = GL_RGBA;	break;
+	}
 
-	unsigned int m_texture;
-	glGenTextures(1, &m_texture);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, name);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	stbi_image_free(&name);
+	makeTexture(name, width, height, format, data);
+	stbi_image_free(data);
 
 
 	//TODO_D("This should load a texture from a file, using makeTexture to perform the allocation.\nUse STBI, and make sure you switch the format STBI provides to match what openGL needs!");
@@ -296,7 +297,7 @@ bool nsfw::Assets::loadFBX(const char * name, const char * path)
 	}
 #endif
 	FBXFile myFBX;
-	bool status = myFBX.load(path);
+	bool status = myFBX.load(path, FBXFile::UNITS_CENTIMETER, true, false, true);
 
 	assert(status == true);	// I AM ASSERTING THAT THIS EXPRESSION IS TRUE
 							// 
