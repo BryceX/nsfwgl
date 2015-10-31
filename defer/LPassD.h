@@ -6,7 +6,12 @@
 class LPassD : public nsfw::RenderPass
 {
 public:
-	void prep() { TODO_D("glUseProgram, glClear, glBindFrameBuffer, glViewPort, glEnable etc..."); }
+	void prep() 
+	{
+		glUseProgram(*shader);
+		glClear(GL_COLOR_BUFFER_BIT);
+		TODO_D("glUseProgram, glClear, glBindFrameBuffer, glViewPort, glEnable etc..."); 
+	}
 	void post() { TODO_D("Unset any gl settings"); }
 
 
