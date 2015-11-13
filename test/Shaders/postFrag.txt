@@ -20,6 +20,6 @@ void main()
 {
 	//fragColor = texture(0.5f, 0.5f);
 
-	//FragColor = texture(Diffuse, vTexCoord);
-	FragColor = Distort();
+	FragColor = texture(Diffuse, vTexCoord);
+	//FragColor = Distort();
 }

@@ -5,6 +5,7 @@
 #include <glm\ext.hpp>
 #include "GameObject.h"
 #include "Camera.h"
+#include "Light.h"
 
 class ForwardPass : public nsfw::RenderPass
 {
@@ -27,7 +28,7 @@ public:
 		glUseProgram(0);
 	}
 
-	void draw(const Camera &c, const GameObject &go)
+	void draw(const Camera &c, const GameObject &go , const Light &dl)
 	{
 		//Camera
 		setUniform("Projection", nsfw::UNIFORM::MAT4, glm::value_ptr(c.getProjection()));
@@ -35,6 +36,9 @@ public:
 		////GameObject
 		setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
 		setUniform("Diffuse", nsfw::UNIFORM::TEX2, go.diffuse, 0);
+		//Light
+		setUniform("LightColor", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.color) );
+		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction) );
 
 		glBindVertexArray(*go.mesh);
 		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);

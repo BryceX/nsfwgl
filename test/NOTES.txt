@@ -1,0 +1,11 @@
+# Adding shadows the project
+1. Write the code for the Shadow Pass
+	a. write ShadowPass::prep()
+	b. write ShadowPass::post()
+	c. write ShadowPass::draw()
+2. Write the shaders for the shadows
+	a. write ShadowVert
+	b. write ShadowFrag
+3. Load the shaders for the shadow pass
+4. Create a shadow pass with a depth attachment
+5. Render the shadow pass in the draw loop

@@ -39,7 +39,7 @@ void nsfw::Window::term()
 	
 	glfwTerminate();
 	glfwDestroyWindow(window);
-	TODO();
+	//TODO();
 }
 
 void nsfw::Window::SetTime() 

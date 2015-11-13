@@ -1,4 +1,3 @@
-
 #include "DefApp.h"
 
 #include "Geometry.h"
@@ -6,10 +5,31 @@
 #include "Camera.h"
 
 #include "GPass.h"
-#include "CPass.h"
-#include "LPassD.h"
+//#include "CPass.h"
+//#include "LPassD.h"
 
 using namespace nsfw;
+
+// Deferred Rendering
+// - things are done in passes
+//   - G-Pass (Geometry)
+//       - determining the full-bright color of an object
+//		 - transforming the vertex data
+//       - encoding vertex data into textures
+//	 - L-Pass (Lighting)
+//       - shading
+//   - C-Pass (Compositing)
+//		 - assembling the final image
+
+// Process
+//	1. Get it compiling again
+//  2. Get the C-Pass up and running
+//		a. Test this by having the full-screen quad in the C-Pass use texcoords for its color information
+//	3. Get the G-Pass up and running
+//	4. Pass information between the G-Pass to the C-Pass
+//  5. Have the C-Pass draw information that it is given by the G-Pass
+// 
+//  Use Nsight to verify that the textures are loading as expected
 
 int main()
 {
@@ -72,17 +92,17 @@ void DeferredApplication::onStep()
 	m_soulspear->update();
 	
 	TODO_D("Draw all of our renderpasses!");
-	m_geometryPass->prep();
-	m_geometryPass->draw(*m_camera, *m_soulspear);
-	m_geometryPass->post();
+	//m_geometryPass->prep();
+	//m_geometryPass->draw(*m_camera, *m_soulspear);
+	//m_geometryPass->post();
 
-	m_directionalLightPass->prep();
-	m_directionalLightPass->draw(*m_camera, *m_light);
-	m_directionalLightPass->post();
+	////m_directionalLightPass->prep();
+	////m_directionalLightPass->draw(*m_camera, *m_light);
+	////m_directionalLightPass->post();
 
-	m_compositePass->prep();
-	m_compositePass->draw();
-	m_compositePass->post();
+	//m_compositePass->prep();
+	//m_compositePass->draw();
+	//m_compositePass->post();
 }
 
 void DeferredApplication::onTerm()

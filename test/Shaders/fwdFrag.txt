@@ -1,0 +1,22 @@
+#version 410
+
+in vec2 vTexCoord;
+in vec4 vNormal;
+
+out vec4 FragColor;
+uniform sampler2D Diffuse;
+
+uniform vec4 LightColor;
+uniform vec4 LightDirection;
+
+void main()
+{	
+   vec4 ObjectColor = texture(Diffuse, vTexCoord);
+   
+   float d = max(0,-dot(vNormal, LightDirection));
+   
+   // use shadowMap to determine if something is lit or not
+	// if it isn't lit, then d = 0
+   
+   FragColor = ObjectColor * d * LightColor;
+}

@@ -6,6 +6,7 @@ layout(location = 2)in vec4 Tangent;
 layout(location = 3)in vec2 TexCoord;
 
 out vec2 vTexCoord;	// v ... for VERTEX! (not vendetta)
+out vec4 vNormal;
 
 uniform mat4 Projection;	// camera's projection matrix (how the world is percieved)
 uniform mat4 View;			// camera's view matrix (where it's looking at)
@@ -13,6 +14,8 @@ uniform mat4 Model;			// model matrix -- this is your transform
 
 void main()
 {
-	vTexCoord = TexCoord;
+
+	vTexCoord   = TexCoord;
+	vNormal     = Projection * View * Model * Normal;
     gl_Position = Projection * View * Model * Position;
 }

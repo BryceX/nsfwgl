@@ -431,7 +431,7 @@ void nsfw::Assets::init()
 
 void nsfw::Assets::term()
 {
-	TODO();
+	//TODO();
 	for each(std::pair<AssetKey,unsigned> k in handles)
 	{
 		GLuint handle = k.second;
