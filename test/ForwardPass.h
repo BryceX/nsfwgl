@@ -40,6 +40,18 @@ public:
 		setUniform("LightColor", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.color) );
 		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction) );
 
+		glm::mat4 clipToUV = glm::scale(glm::mat4(1.0f),glm::vec3(0.5f));
+			// first, scale it down by half in all components (xyz)
+
+		clipToUV = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+							// then, translate it back by 1 in all components (xyz)
+		
+
+		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(clipToUV * dl.getProjection() * dl.getView()));
+
+		nsfw::Asset<nsfw::ASSET::TEXTURE> shadowmap = "ShadowMap";
+		setUniform("ShadowMap", nsfw::UNIFORM::TEX2, shadowmap, 1);
+
 		glBindVertexArray(*go.mesh);
 		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
 	}

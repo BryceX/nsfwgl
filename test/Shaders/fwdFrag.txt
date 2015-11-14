@@ -19,4 +19,5 @@ void main()
 	// if it isn't lit, then d = 0
    
    FragColor = ObjectColor * d * LightColor;
+   
 }

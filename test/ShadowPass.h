@@ -15,11 +15,12 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, *fbo);
 		glViewport(0, 0, 1024, 1024);
 		glUseProgram(*shader);
-
+		glClear(GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
-		glClearColor(0, 0, 0, 0);
-		glClear(GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.25f, 0.25f, 0.25f, 1);
+		
+	
 	}
 
 	void post()
@@ -34,16 +35,14 @@ public:
 		glDisable(GL_CULL_FACE);
 	}
 
-	void draw(const GameObject &go, const Light &dl)
+	void draw(const GameObject &go, Light &dl)
 	{
-		glm::mat4 lightProjection = glm::ortho<float>(-10, 10,-10, 10, -10, 10);
-		glm::mat4 lightView = glm::lookAt(dl.direction,glm::vec3(0), glm::vec3(0, 1, 0));
-		glm::mat4 lightMatrix = lightProjection* lightView;
-
-		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(lightMatrix));
-
-		glBindVertexArray(*go.mesh);
-		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
+		
+			setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(dl.getProjection()*dl.getView()));
+			setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
+			glBindVertexArray(*go.mesh);
+			glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
+		
 	}
 
 

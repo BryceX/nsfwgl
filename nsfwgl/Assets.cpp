@@ -304,6 +304,7 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 		printf("Error: Failed to link shader program!\n");
 		printf("%s\n", infoLog);
 		delete[] infoLog;
+		return false;
 	}
 	setINTERNAL(GL_HANDLE_TYPE::SHADER, name, shader);
 

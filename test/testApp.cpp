@@ -62,7 +62,8 @@ void TestApp::onPlay()
 
 	directionLight.color = glm::vec4(1.f,.5f,.5f,1.f);
 	directionLight.direction = glm::normalize(glm::vec3(1.f,2.5f,1.f));
-	glm::mat4 lightProjection = glm::ortho<float>(-10,10,-10,10,-10,10);
+
+
 }
 
 void TestApp::onStep()
@@ -73,6 +74,8 @@ void TestApp::onStep()
 
 	shadowPass.prep();
 	shadowPass.draw(gameObject, directionLight);
+	shadowPass.draw(gameObject1, directionLight);
+	shadowPass.draw(floor, directionLight);
 	shadowPass.post();
 
 	forwardPass.prep();

@@ -16,6 +16,13 @@ void main()
 {
 
 	vTexCoord   = TexCoord;
-	vNormal     = Projection * View * Model * Normal;
+	vNormal     = View * Model * Normal;
     gl_Position = Projection * View * Model * Position;
 }
+
+/*
+	Projection : Converts from Camera Space to Clip Space
+	View	   : Converts from World Space to Camera Space
+	Model	   : Converts from Model Space to World Space
+	Position   : Of a Vertex
+*/
