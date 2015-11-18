@@ -3,7 +3,7 @@
 void TestApp::onInit() 
 {
 	
-	auto			&window	 = nsfw::Window::instance();
+	auto &window = nsfw::Window::instance();
 
 	nsfw::Assets::instance().loadShader("Basic", "Shaders/fwdVert.txt","Shaders/fwdFrag.txt");
 	nsfw::Assets::instance().loadShader("PostProc", "Shaders/postVert.txt","Shaders/postFrag.txt");
@@ -30,7 +30,7 @@ void TestApp::onPlay()
 {
 	// initialize my scene objects
 	camera.maspect = nsfw::Window::instance().getWidth() / (float)nsfw::Window::instance().getHeight();
-	camera.lookAt(glm::vec3(3), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.lookAt(glm::vec3(10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	// initialize my gameObject
 	gameObject.transform = glm::mat4(1);
@@ -49,12 +49,10 @@ void TestApp::onPlay()
 	floor.tris = "Quad";
 	// initialize my forward pass
 	forwardPass.shader = "Basic";
-	forwardPass.fbo = "Render";
+	forwardPass.fbo = "Screen";
 	
 	shadowPass.shader = "Shadows";
 	shadowPass.fbo = "ShadowPass";
-
-	
 
 	postPass.shader = "PostProc";
 	postPass.fbo = "Screen";
@@ -62,8 +60,6 @@ void TestApp::onPlay()
 
 	directionLight.color = glm::vec4(1.f,.5f,.5f,1.f);
 	directionLight.direction = glm::normalize(glm::vec3(1.f,2.5f,1.f));
-
-
 }
 
 void TestApp::onStep()
@@ -86,9 +82,9 @@ void TestApp::onStep()
 
 
 
-	postPass.prep();
-	postPass.draw();
-	postPass.post();
+	//postPass.prep();
+	//postPass.draw();
+	//postPass.post();
 }
 
 

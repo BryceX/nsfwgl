@@ -1,10 +1,18 @@
 #version 410
 
+// geometry
 in vec2 vTexCoord;
 in vec4 vNormal;
 
+// shadows
+in vec4 vShadowCoord;
+
 out vec4 FragColor;
+
 uniform sampler2D Diffuse;
+uniform sampler2D ShadowMap;
+
+uniform float ShadowBias;
 
 uniform vec4 LightColor;
 uniform vec4 LightDirection;
@@ -15,9 +23,14 @@ void main()
    
    float d = max(0,-dot(vNormal, LightDirection));
    
-   // use shadowMap to determine if something is lit or not
+	// use shadowMap to determine if something is lit or not
 	// if it isn't lit, then d = 0
+	
+	if	(texture(ShadowMap, vShadowCoord.xy).r < vShadowCoord.z - 0.01)
+	{
+		d = 0;
+	}
    
-   FragColor = ObjectColor * d * LightColor;
-   
+   //FragColor = ObjectColor * d * LightColor;
+   FragColor = vec4(d,d,d,1);
 }

@@ -7,17 +7,24 @@ layout(location = 3)in vec2 TexCoord;
 
 out vec2 vTexCoord;	// v ... for VERTEX! (not vendetta)
 out vec4 vNormal;
+out vec4 vShadowCoord;
 
 uniform mat4 Projection;	// camera's projection matrix (how the world is percieved)
 uniform mat4 View;			// camera's view matrix (where it's looking at)
 uniform mat4 Model;			// model matrix -- this is your transform
+
+uniform mat4 LightMatrix;
 
 void main()
 {
 
 	vTexCoord   = TexCoord;
 	vNormal     = View * Model * Normal;
-    gl_Position = Projection * View * Model * Position;
+    
+	// transformed into shadow space!
+	vShadowCoord = LightMatrix * Position;
+	
+	gl_Position = Projection * View * Model * Position;
 }
 
 /*
