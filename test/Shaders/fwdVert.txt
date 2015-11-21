@@ -19,10 +19,10 @@ void main()
 {
 
 	vTexCoord   = TexCoord;
-	vNormal     = View * Model * Normal;
+	vNormal     = Model * Normal;
     
 	// transformed into shadow space!
-	vShadowCoord = LightMatrix * Position;
+	vShadowCoord = LightMatrix * Model * Position;
 	
 	gl_Position = Projection * View * Model * Position;
 }

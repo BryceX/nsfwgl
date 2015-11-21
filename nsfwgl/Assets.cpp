@@ -103,6 +103,61 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	//TODO_D("Should generate VBO, IBO, VAO, and SIZE using the parameters, storing them in the 'handles' map.\nThis is where vertex attributes are set!");
 	return true;
 }
+bool nsfw::Assets::makeVAO(const char * name, const struct ParticleVertex *verts, unsigned vsize, const unsigned * tris, unsigned tsize)
+{
+#if _DEBUG
+	// check if the data is valid
+	if (verts == nullptr)
+	{
+		std::cout << "ERROR: Vertex data is null!" << std::endl;
+		return false;
+	}
+#endif
+
+	// logs for the asset manager
+	ASSET_LOG(GL_HANDLE_TYPE::VBO);	// Trying to create key VBO...
+	ASSET_LOG(GL_HANDLE_TYPE::IBO);
+	ASSET_LOG(GL_HANDLE_TYPE::VAO);
+	ASSET_LOG(GL_HANDLE_TYPE::SIZE);
+	GLuint vao, vbo, ibo;
+
+	glGenVertexArrays(1, &vao);	// generate the VAO
+	glGenBuffers(1, &vbo);	// generate the VBO
+	glGenBuffers(1, &ibo);	// generate the IBO
+
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// bind the IBO
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);	// bind the VBO
+
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vsize, verts, GL_STATIC_DRAW); // buffer the VBO
+
+																				  // specify the attributes for the VBO
+	glEnableVertexAttribArray(0);	// pos
+	glEnableVertexAttribArray(1);	// normal
+	glEnableVertexAttribArray(2);	// tangent
+	glEnableVertexAttribArray(3);	// texcoord
+
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
+	glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
+	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tsize, tris, GL_STATIC_DRAW); // buffer the IBO
+
+	glBindVertexArray(0); // unbind the VAO
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind the VBO
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind the IBO
+
+	setINTERNAL(VAO, name, vao);						// save the VAO to the assman
+	setINTERNAL(VBO, name, vbo);						// save the VBO to the assman
+	setINTERNAL(IBO, name, ibo);						// save the IBO to the assman
+	setINTERNAL(GL_HANDLE_TYPE::SIZE, name, tsize);		// save the SIZE to the assman
+
+
+														//TODO_D("Should generate VBO, IBO, VAO, and SIZE using the parameters, storing them in the 'handles' map.\nThis is where vertex attributes are set!");
+	return true;
+}
 
 bool nsfw::Assets::makeFBO(const char * name, unsigned w, unsigned h, unsigned nTextures, const char * names[], const unsigned depths[])
 {

@@ -151,6 +151,7 @@
     <ClInclude Include="..\dep\TinyOBJ\tiny_obj_loader.h" />
     <ClInclude Include="Application.h" />
     <ClInclude Include="Assets.h" />
+    <ClInclude Include="ParticleVertex.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="nsfw.h" />
     <ClInclude Include="render.h" />

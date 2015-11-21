@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "Camera.h"
 #include "Light.h"
+#include "ParticleEmitter.h"
 
 class ForwardPass : public nsfw::RenderPass
 {
@@ -32,7 +33,7 @@ public:
 		glUseProgram(0);
 	}
 
-	void draw(const Camera &c, const GameObject &go , const Light &dl)
+	void draw(const Camera &c, const GameObject &go, const Light &dl)
 	{
 		glm::mat4 clipToUV = glm::scale(.5f, .5f, .5f);
 		//// first, scale it down by half in all components (xyz)
@@ -44,24 +45,78 @@ public:
 		setUniform("View", nsfw::UNIFORM::MAT4, glm::value_ptr(c.getView()));
 		////GameObject
 		setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
-		
+
 		setUniform("Diffuse", nsfw::UNIFORM::TEX2, go.diffuse, 0);
 		//Light
 		//setUniform("LightColor", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.color) );
-		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction) );
+		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction));
 
+		/*
+		* DON'T TOUCH THIS
+		* \/\/\/\/\/
+		*/
 		glm::mat4 texSpaceOffset(0.5f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.5f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.5f, 0.0f,
 			0.5f, 0.5f, 0.5f, 1.0f);
+		/*
+		* /\/\/\/\/\/\
+		* DON'T TOUCH THAT
+		*/
 
-		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(clipToUV * (dl.getProjection() * dl.getView())));
-		
+		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(texSpaceOffset * dl.getProjection() * dl.getView()));
+
 		// HACK: hard coding value for ShadowMap texture
 		nsfw::Asset<nsfw::ASSET::TEXTURE> shadowmap = "ShadowMap";
 		setUniform("ShadowMap", nsfw::UNIFORM::TEX2, shadowmap, 1);
 
 		glBindVertexArray(*go.mesh);
 		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
+	}
+
+	void draw(const Camera &c, const ParticleEmitter &pe, const Light &dl)
+	{
+		glm::mat4 clipToUV = glm::scale(.5f, .5f, .5f);
+		//// first, scale it down by half in all components (xyz)
+		clipToUV = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+		//// then, translate it back by 1 in all components (xyz)
+
+		//Camera
+		setUniform("Projection", nsfw::UNIFORM::MAT4, glm::value_ptr(c.getProjection()));
+		setUniform("View", nsfw::UNIFORM::MAT4, glm::value_ptr(c.getView()));
+		////GameObject
+
+		setUniform("Diffuse", nsfw::UNIFORM::TEX2, pe.diffuse, 0);
+		//Light
+		//setUniform("LightColor", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.color) );
+		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction));
+
+		/*
+		* DON'T TOUCH THIS
+		* \/\/\/\/\/
+		*/
+		glm::mat4 texSpaceOffset(0.5f, 0.0f, 0.0f, 0.0f,
+			0.0f, 0.5f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.5f, 0.0f,
+			0.5f, 0.5f, 0.5f, 1.0f);
+		/*
+		* /\/\/\/\/\/\
+		* DON'T TOUCH THAT
+		*/
+
+		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(texSpaceOffset * dl.getProjection() * dl.getView()));
+
+		// HACK: hard coding value for ShadowMap texture
+		nsfw::Asset<nsfw::ASSET::TEXTURE> shadowmap = "ShadowMap";
+		setUniform("ShadowMap", nsfw::UNIFORM::TEX2, shadowmap, 1);
+
+		for (int i = 0; i < pe.GetArraySize(); i++) {
+			setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(pe.GetParticleMatrix(i)));
+
+			glBindVertexArray(*pe.mesh);
+			glDrawElements(GL_TRIANGLES, *pe.tris, GL_UNSIGNED_INT, 0);
+
+		}
+
 	}
 };

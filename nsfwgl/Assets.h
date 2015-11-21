@@ -115,6 +115,7 @@ namespace nsfw
 
 		// Should also allocate for IBO and VBO
 		bool makeVAO(const char *name, const struct Vertex *verts, unsigned vsize, const unsigned *tris, unsigned tsize);
+		bool makeVAO(const char *name, const struct ParticleVertex *verts, unsigned vsize, const unsigned *tris, unsigned tsize);
 
 		// should call makeTexture nTextures number of times
 		bool makeFBO(const char *name, unsigned w, unsigned h, unsigned nTextures, const char *names[], const unsigned depths[]);

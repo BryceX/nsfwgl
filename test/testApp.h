@@ -6,6 +6,7 @@
 #include "nsfw.h"
 #include "Camera.h"
 #include "GameObject.h"
+#include "ParticleEmitter.h"
 
 
 class TestApp : public nsfw::Application
@@ -15,7 +16,8 @@ class TestApp : public nsfw::Application
 	GameObject gameObject;
 	GameObject gameObject1;
 	GameObject floor;
-	
+	GameObject wall;
+	ParticleEmitter PE;
 	ForwardPass forwardPass;
 	ShadowPass shadowPass;
 	PostProcPass postPass;

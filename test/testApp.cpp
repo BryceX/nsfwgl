@@ -38,15 +38,31 @@ void TestApp::onPlay()
 	gameObject.mesh		 = "Spear";
 	gameObject.tris		 = "Spear";
 
-	gameObject1.transform = glm::translate(1,0,0);
+	/*gameObject1.transform = glm::translate(2,0,1);
 	gameObject1.diffuse  = "White";
 	gameObject1.mesh	 = "Spear";
-	gameObject1.tris	 = "Spear";
+	gameObject1.tris	 = "Spear";*/
 
-	floor.transform =  glm::rotate(90.f,vec3(-1.f,0.f,0.f))  * glm::scale(10.f, 10.f, 1.f);
+	floor.transform =  glm::translate(0.f,0.0f,0.f) * glm::rotate(-90.f,vec3(1.f,0.f,0.f))  * glm::scale(10.f, 10.f, 1.f);
 	floor.diffuse = "White";
 	floor.mesh = "Quad";
 	floor.tris = "Quad";
+
+	wall.transform = glm::translate(-10.f, 0.0f, 0.f) * glm::rotate(90.f, vec3(0.f, 1.f, 0.f)) *  glm::scale(10.f, 10.f, 1.f);
+	wall.diffuse = "White";
+	wall.mesh = "Quad";
+	wall.tris = "Quad";
+
+	
+	PE.Init(30);
+	PE.diffuse = "White";
+	PE.mesh = "Cube";
+	PE.tris = "Cube";
+	PE.startPosition = glm::vec3(0, 0, 0);
+	PE.speed = 1;
+	PE.lifeSpan = 3;
+	PE.emissionRate = .5;
+
 	// initialize my forward pass
 	forwardPass.shader = "Basic";
 	forwardPass.fbo = "Screen";
@@ -58,26 +74,38 @@ void TestApp::onPlay()
 	postPass.fbo = "Screen";
 	postPass.color = "RenderColor";
 
-	directionLight.color = glm::vec4(1.f,.5f,.5f,1.f);
-	directionLight.direction = glm::normalize(glm::vec3(1.f,2.5f,1.f));
+	//directionLight.color = glm::vec4(.5f,.5f,.5f,1.f);
+	directionLight.direction = glm::normalize(glm::vec4(0.f,0.f,1.0f,0));
+
+
 }
 
 void TestApp::onStep()
 {
+
+	
+
 	nsfw::Window::instance().SetTime();
 	float time = nsfw::Window::instance().timePassed;
 	gameObject.transform = glm::rotate(time * 100, glm::vec3(0, 1, 0));
+
+	directionLight.direction = glm::rotate(time*10, glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(0.f,1.f,0.f,0.f);
+
+	PE.Update(nsfw::Window::instance().deltaTime);
 
 	shadowPass.prep();
 	shadowPass.draw(gameObject, directionLight);
 	shadowPass.draw(gameObject1, directionLight);
 	shadowPass.draw(floor, directionLight);
+	shadowPass.draw(wall, directionLight);
 	shadowPass.post();
 
 	forwardPass.prep();
-	forwardPass.draw(camera, gameObject, directionLight);
-	forwardPass.draw(camera, gameObject1, directionLight);
-	forwardPass.draw(camera, floor, directionLight);
+	//forwardPass.draw(camera, gameObject, directionLight);
+	//forwardPass.draw(camera, gameObject1, directionLight);
+	//forwardPass.draw(camera, floor, directionLight);
+	//forwardPass.draw(camera, wall, directionLight);
+	forwardPass.draw(camera, PE, directionLight);
 	forwardPass.post();
 
 

@@ -21,7 +21,7 @@ void main()
 {	
    vec4 ObjectColor = texture(Diffuse, vTexCoord);
    
-   float d = max(0,-dot(vNormal, LightDirection));
+   float d = max(0,dot(vNormal, LightDirection));
    
 	// use shadowMap to determine if something is lit or not
 	// if it isn't lit, then d = 0

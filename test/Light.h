@@ -4,7 +4,7 @@
 
 struct Light
 {
-	glm::vec3 direction;
+	glm::vec4 direction;
 	glm::vec4 color;
 
 	glm::mat4 getView() const //formerly known as lightview
