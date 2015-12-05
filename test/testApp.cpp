@@ -106,8 +106,8 @@ void TestApp::onStep()
 	//forwardPass.draw(camera, gameObject1, directionLight);
 	//forwardPass.draw(camera, floor, directionLight);
 	//forwardPass.draw(camera, wall, directionLight);
-	forwardPass.draw(camera, PE, directionLight);
-	forwardPass.post();
+	//forwardPass.draw(camera, PE, directionLight);
+	//forwardPass.post();
 	GPUPE.Draw(time,camera.transform,camera.getProjection());
 	
 

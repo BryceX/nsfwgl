@@ -54,7 +54,8 @@ void GPUParticleEmitter::Draw
 	glUniform1f(location, deltaTime);
 	location = glGetUniformLocation(m_updateShader,
 		"emitterPosition");
-	glUniform3fv(location, 1, &startPosition[0]);	glEnable(GL_RASTERIZER_DISCARD);
+	glUniform3fv(location, 1, &startPosition[0]);
+	glEnable(GL_RASTERIZER_DISCARD);
 
 	glBindVertexArray(m_vao[m_activeBuffer]);
 
@@ -77,7 +78,7 @@ void GPUParticleEmitter::Draw
 
 	// draw the particles using the Geometry SHader to billboard them
 	glUseProgram(m_drawShader);
-	unsigned location = glGetUniformLocation(m_drawShader, "projectionView");
+	location = glGetUniformLocation(m_drawShader, "projectionView");
 	glUniformMatrix4fv(location, 1, false, &a_projectionView[0][0]);
 	location = glGetUniformLocation(m_drawShader, "cameraTransform");
 	glUniformMatrix4fv(location, 1, false, &a_cameraTransform[0][0]);
@@ -89,7 +90,8 @@ void GPUParticleEmitter::Draw
 
 
 	// swap for next frame
-	m_activeBuffer = otherBuffer;
+	m_activeBuffer = otherBuffer;
+
 }
 void GPUParticleEmitter::createBuffers() 
 {
