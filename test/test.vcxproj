@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GPUParticleEmitter.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="Source.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)nsfwgl;$(SolutionDir)dep\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -131,6 +132,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ForwardPass.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="GPUParticleEmitter.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="ParticleEmitter.h" />
     <ClInclude Include="PostProcPass.h" />

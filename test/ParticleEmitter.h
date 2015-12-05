@@ -1,6 +1,6 @@
 #pragma once
 #include "nsfw.h" 
-#include "Camera.h"
+//#include "Camera.h"
 #include <vector>
 
 

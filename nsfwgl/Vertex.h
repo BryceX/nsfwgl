@@ -20,6 +20,25 @@ namespace nsfw
 			TEXCOORD_OFFSET		= TANGENT_OFFSET	+ sizeof(glm::vec4),
 		};
 	};
+	struct ParticleVertex 
+	{
+			ParticleVertex() :lifetime(1), lifespan(0) {}
+
+			glm::vec3 position;
+			glm::vec3 velocity;
+
+			float lifetime;
+			float lifespan;
+		
+		enum OFFSETS
+		{
+			POSITION_OFFSET = 0,
+			VELOCITY_OFFSET = POSITION_OFFSET + sizeof(glm::vec3),
+			LIFETIME_OFFSET = VELOCITY_OFFSET + sizeof(glm::vec3),
+			LIFESPAN_OFFSET = LIFETIME_OFFSET + sizeof(float),
+		};
+	};
+
 
 	const vec4 up(0, 1, 0, 0);
 	const vec4 down = -up;

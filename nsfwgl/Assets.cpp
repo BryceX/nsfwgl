@@ -103,7 +103,7 @@ bool nsfw::Assets::makeVAO(const char * name, const struct Vertex *verts, unsign
 	//TODO_D("Should generate VBO, IBO, VAO, and SIZE using the parameters, storing them in the 'handles' map.\nThis is where vertex attributes are set!");
 	return true;
 }
-bool nsfw::Assets::makeVAO(const char * name, const struct ParticleVertex *verts, unsigned vsize, const unsigned * tris, unsigned tsize)
+bool nsfw::Assets::makeVAO(const char * name, const struct ParticleVertex *verts, unsigned vsize)
 {
 #if _DEBUG
 	// check if the data is valid
@@ -116,43 +116,40 @@ bool nsfw::Assets::makeVAO(const char * name, const struct ParticleVertex *verts
 
 	// logs for the asset manager
 	ASSET_LOG(GL_HANDLE_TYPE::VBO);	// Trying to create key VBO...
-	ASSET_LOG(GL_HANDLE_TYPE::IBO);
 	ASSET_LOG(GL_HANDLE_TYPE::VAO);
 	ASSET_LOG(GL_HANDLE_TYPE::SIZE);
-	GLuint vao, vbo, ibo;
+	GLuint vao, vbo,size=vsize;
 
 	glGenVertexArrays(1, &vao);	// generate the VAO
 	glGenBuffers(1, &vbo);	// generate the VBO
-	glGenBuffers(1, &ibo);	// generate the IBO
+		
 
 	glBindVertexArray(vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);	// bind the IBO
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);	// bind the VBO
 
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vsize, verts, GL_STATIC_DRAW); // buffer the VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertex) * vsize, verts, GL_STATIC_DRAW); // buffer the VBO
 
 																				  // specify the attributes for the VBO
 	glEnableVertexAttribArray(0);	// pos
-	glEnableVertexAttribArray(1);	// normal
-	glEnableVertexAttribArray(2);	// tangent
-	glEnableVertexAttribArray(3);	// texcoord
+	glEnableVertexAttribArray(1);	// vel
+	glEnableVertexAttribArray(2);	// time
+	glEnableVertexAttribArray(3);	// span
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::POSITION_OFFSET));
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::NORMAL_OFFSET));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex), (void*)(Vertex::TANGENT_OFFSET));
-	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(Vertex::TEXCOORD_OFFSET));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)(ParticleVertex::POSITION_OFFSET));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)(ParticleVertex::VELOCITY_OFFSET));
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)(ParticleVertex::LIFETIME_OFFSET));
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleVertex), (void*)(ParticleVertex::LIFESPAN_OFFSET));
 
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tsize, tris, GL_STATIC_DRAW); // buffer the IBO
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * tsize, tris, GL_STATIC_DRAW); // buffer the IBO
 
 	glBindVertexArray(0); // unbind the VAO
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind the VBO
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); // unbind the IBO
+	
 
 	setINTERNAL(VAO, name, vao);						// save the VAO to the assman
 	setINTERNAL(VBO, name, vbo);						// save the VBO to the assman
-	setINTERNAL(IBO, name, ibo);						// save the IBO to the assman
-	setINTERNAL(GL_HANDLE_TYPE::SIZE, name, tsize);		// save the SIZE to the assman
+	setINTERNAL(GL_HANDLE_TYPE::SIZE, name, size);		// save the SIZE to the assman
 
 
 														//TODO_D("Should generate VBO, IBO, VAO, and SIZE using the parameters, storing them in the 'handles' map.\nThis is where vertex attributes are set!");
@@ -318,7 +315,7 @@ unsigned int nsfw::Assets::loadSubShader(unsigned int type, const char* path)
 	return shader;
 }
 
-bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char * fpath)
+bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char *fpath)
 {
 
 	
@@ -367,6 +364,110 @@ bool nsfw::Assets::loadShader(const char * name, const char * vpath, const char 
 	//TODO_D("Load shader from a file.");
 	return true;
 }
+bool nsfw::Assets::loadShader(const char * name, const char *vpath, const char *gpath , const char *fpath)
+{
+
+	ASSET_LOG(GL_HANDLE_TYPE::SHADER);
+	GLuint shader = glCreateProgram();
+
+	std::ifstream vin(vpath);
+	std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
+	std::ifstream gin(gpath);
+	std::string gcontents((std::istreambuf_iterator<char>(gin)), std::istreambuf_iterator<char>());
+	std::ifstream fin(fpath);
+	std::string fcontents((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+
+
+	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint gShader = glCreateShader(GL_GEOMETRY_SHADER);
+	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	const char *vs = vcontents.c_str();
+	const char *gs = gcontents.c_str();
+	const char *fs = fcontents.c_str();
+
+	glShaderSource(vShader, 1, &vs, 0);
+	glShaderSource(gShader, 1, &gs, 0);
+	glShaderSource(fShader, 1, &fs, 0);
+	glCompileShader(vShader);
+	glCompileShader(gShader);
+	glCompileShader(fShader);
+	glAttachShader(shader, vShader);
+	glAttachShader(shader, gShader);
+	glAttachShader(shader, fShader);
+	glLinkProgram(shader);
+	glDeleteShader(vShader);
+	glDeleteShader(gShader);
+	glDeleteShader(fShader);
+
+
+	int success;
+
+	glGetProgramiv(shader, GL_LINK_STATUS, &success);
+	if (success == GL_FALSE)
+	{
+		int infoLogLength = 0;
+		glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		char* infoLog = new char[infoLogLength];
+		glGetProgramInfoLog(shader, infoLogLength, 0, infoLog);
+		printf("Error: Failed to link shader program!\n");
+		printf("%s\n", infoLog);
+		delete[] infoLog;
+		return false;
+	}
+	setINTERNAL(GL_HANDLE_TYPE::SHADER, name, shader);
+
+
+	//TODO_D("Load shader from a file.");
+	return true;
+}
+
+bool nsfw::Assets::loadUpdateShader(const char * name, const char * vpath, const char* varyings[], int noutputvars)
+{
+
+
+	ASSET_LOG(GL_HANDLE_TYPE::SHADER);
+	GLuint shader = glCreateProgram();
+
+	std::ifstream vin(vpath);
+	std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
+
+	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+
+	const char *vs = vcontents.c_str();
+
+	glShaderSource(vShader, 1, &vs, 0);
+	glCompileShader(vShader);
+	glAttachShader(shader, vShader);
+	// const char* varyings[] = { "position", "velocity","lifetime", "lifespan" };
+
+	glTransformFeedbackVaryings(shader, noutputvars, varyings, GL_INTERLEAVED_ATTRIBS);
+
+	glLinkProgram(shader);
+	glDeleteShader(vShader);
+
+
+	int success;
+
+	glGetProgramiv(shader, GL_LINK_STATUS, &success);
+	if (success == GL_FALSE)
+	{
+		int infoLogLength = 0;
+		glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		char* infoLog = new char[infoLogLength];
+		glGetProgramInfoLog(shader, infoLogLength, 0, infoLog);
+		printf("Error: Failed to link shader program!\n");
+		printf("%s\n", infoLog);
+		delete[] infoLog;
+		return false;
+	}
+	setINTERNAL(GL_HANDLE_TYPE::SHADER, name, shader);
+
+
+	//TODO_D("Load shader from a file.");
+	return true;
+}
+
 
 bool nsfw::Assets::loadFBX(const char * name, const char * path)
 {

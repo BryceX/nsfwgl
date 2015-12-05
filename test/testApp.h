@@ -1,12 +1,12 @@
 #pragma once
-
+#include "nsfw.h"
 #include "ForwardPass.h"
 #include "PostProcPass.h"
 #include "ShadowPass.h"
-#include "nsfw.h"
-#include "Camera.h"
-#include "GameObject.h"
-#include "ParticleEmitter.h"
+//#include "Camera.h"
+//#include "GameObject.h"
+//#include "ParticleEmitter.h"
+#include "GPUParticleEmitter.h"
 
 
 class TestApp : public nsfw::Application
@@ -18,6 +18,7 @@ class TestApp : public nsfw::Application
 	GameObject floor;
 	GameObject wall;
 	ParticleEmitter PE;
+	GPUParticleEmitter GPUPE;
 	ForwardPass forwardPass;
 	ShadowPass shadowPass;
 	PostProcPass postPass;
