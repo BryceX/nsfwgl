@@ -8,7 +8,7 @@ void TestApp::onInit()
 	nsfw::Assets::instance().loadShader("Basic", "Shaders/fwdVert.txt","Shaders/fwdFrag.txt");
 	nsfw::Assets::instance().loadShader("PostProc", "Shaders/postVert.txt","Shaders/postFrag.txt");
 	nsfw::Assets::instance().loadShader("Shadows", "Shaders/shadowVert.txt", "Shaders/shadowFrag.txt");
-	GPUPE.Init(20,5,20,5,20,1,9,glm::vec4(1.f,1.f,1.f,1.f),vec4(1.f,0.f,0.f,1.f));
+	GPUPE.Init(100, .1f, 5.0f, 1,10,1,.1f,glm::vec4(1.f,0.f,0.f,1.f),vec4(1.f,1.f,0.f,1.f));
 	const char * shadowTexture[] = { "ShadowMap" };
 	const unsigned shadowDepth[] = { GL_DEPTH_COMPONENT };
 	nsfw::Assets::instance().makeFBO("ShadowPass", 1024, 1024, 1, shadowTexture, shadowDepth);
@@ -19,8 +19,8 @@ void TestApp::onInit()
 	nsfw::Assets::instance().makeFBO("Render", window.getWidth(), window.getHeight(), 2, RenderTextures, RenderDepths);	
 
 	
-	//nsfw::Assets::instance().loadFBX("Spear", "../FBX/soulspear/soulspear.fbx");
-	//nsfw::Assets::instance().loadTexture("Spear", "../FBX/soulspear/soulspear_diffuse.tga");
+	nsfw::Assets::instance().loadFBX("Spear", "../FBX/soulspear/soulspear.fbx");
+	nsfw::Assets::instance().loadTexture("Spear", "../FBX/soulspear/soulspear_diffuse.tga");
 	////nsfw::Assets::instance().loadOBJ("Bunny", "../OBJ/bunny.obj");
 
 //	nsfw::Assets::instance().loadTexture("Purple", "../resources/textures/purple.png");
@@ -92,23 +92,23 @@ void TestApp::onStep()
 
 	directionLight.direction = glm::rotate(time*10, glm::vec3(0.f, 0.f, 1.f)) * glm::vec4(0.f,1.f,0.f,0.f);
 
-	PE.Update(nsfw::Window::instance().deltaTime);
+	//PE.Update(nsfw::Window::instance().deltaTime);
 
-	shadowPass.prep();
-	shadowPass.draw(gameObject, directionLight);
-	shadowPass.draw(gameObject1, directionLight);
-	shadowPass.draw(floor, directionLight);
-	shadowPass.draw(wall, directionLight);
-	shadowPass.post();
+//	shadowPass.prep();
+//	shadowPass.draw(gameObject, directionLight);
+////	shadowPass.draw(gameObject1, directionLight);
+//	shadowPass.draw(floor, directionLight);
+//	//shadowPass.draw(wall, directionLight);
+//	shadowPass.post();
 
 	forwardPass.prep();
-	//forwardPass.draw(camera, gameObject, directionLight);
+	forwardPass.draw(camera, gameObject, directionLight);
 	//forwardPass.draw(camera, gameObject1, directionLight);
-	//forwardPass.draw(camera, floor, directionLight);
+	forwardPass.draw(camera, floor, directionLight);
 	//forwardPass.draw(camera, wall, directionLight);
 	//forwardPass.draw(camera, PE, directionLight);
-	//forwardPass.post();
-	GPUPE.Draw(time,camera.transform,camera.getProjection());
+	forwardPass.draw(camera, GPUPE);
+	forwardPass.post();
 	
 
 	//postPass.prep();

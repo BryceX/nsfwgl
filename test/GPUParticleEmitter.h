@@ -2,9 +2,6 @@
 #include "nsfw.h"
 
 
-
-
-
 class GPUParticleEmitter {
 public:
 	GPUParticleEmitter::GPUParticleEmitter() :
@@ -51,8 +48,10 @@ protected:
 
 	
 	void createBuffers();
-	void createUpdateShader();
-	void createDrawShader();
+	void createUpdateShader(const char * vpath);
+	void createDrawShader(const char* gpuParticleVert, const char* gpuParticleGeom, const char* gpuParticleFrag);
+
+
 
 	nsfw::ParticleVertex* particles;
 

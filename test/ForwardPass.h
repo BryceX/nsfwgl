@@ -7,6 +7,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "ParticleEmitter.h"
+#include "GPUParticleEmitter.h"
 
 class ForwardPass : public nsfw::RenderPass
 {
@@ -17,24 +18,25 @@ public:
 		glViewport(0, 0, 1280, 720);
 
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_CULL_FACE);
+		//glEnable(GL_CULL_FACE);
 
 		glClearColor(0.25f, 0.25f, 0.25f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(*shader);
+		
 	}
 
 	void post()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
+		//glDisable(GL_CULL_FACE);
 		glUseProgram(0);
 	}
 
 	void draw(const Camera &c, const GameObject &go, const Light &dl)
 	{
+		glUseProgram(*shader);
 		glm::mat4 clipToUV = glm::scale(.5f, .5f, .5f);
 		//// first, scale it down by half in all components (xyz)
 		clipToUV = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
@@ -118,5 +120,14 @@ public:
 
 		}
 
+		
+
+	}
+	void draw(const Camera &c, GPUParticleEmitter &pe)
+	{
+		float time = nsfw::Window::instance().timePassed;
+
+		glm::mat4 projectionView = c.getProjection() * c.getView();
+		pe.Draw(time, c.transform, projectionView);
 	}
 };

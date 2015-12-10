@@ -32,5 +32,6 @@ void main()
 	}
    
    //FragColor = ObjectColor * d * LightColor;
-   FragColor = vec4(d,d,d,1);
+   FragColor = vec4(1);
+   //FragColor = vec4(d,d,d,1);
 }

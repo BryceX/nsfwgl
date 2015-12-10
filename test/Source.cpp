@@ -8,5 +8,5 @@ int main()
 	temp.play();
 	temp.term();
 
-	system("PAUSE");
+	//system("PAUSE");
 }

@@ -1,6 +1,7 @@
 #include <gl_core_4_4.h>
 #include "glm/ext.hpp"
 #include "GPUParticleEmitter.h"
+#include <fstream>
 
 void GPUParticleEmitter::Init
 	(unsigned int a_maxParticles,
@@ -32,8 +33,8 @@ void GPUParticleEmitter::Init
 	// set our starting ping-pong buffer
 	m_activeBuffer = 0;
 	createBuffers();
-	createUpdateShader();
-	createDrawShader();
+	createUpdateShader("Shaders/gpuUpdateShader.txt");
+	createDrawShader("Shaders/gpuParticleVert.txt", "Shaders/gpuParticleGeom.txt", "Shaders/gpuParticleFrag.txt");
 
 }
 
@@ -49,11 +50,11 @@ void GPUParticleEmitter::Draw
 	// bind time information
 	int location = glGetUniformLocation(m_updateShader, "time");
 	glUniform1f(location, time);
-	float deltaTime = time - m_lastDrawTime; m_lastDrawTime = time;
+	float deltaTime = time - m_lastDrawTime;
+	m_lastDrawTime = time;
 	location = glGetUniformLocation(m_updateShader, "deltaTime");
 	glUniform1f(location, deltaTime);
-	location = glGetUniformLocation(m_updateShader,
-		"emitterPosition");
+	location = glGetUniformLocation(m_updateShader,	"emitterPosition");
 	glUniform3fv(location, 1, &startPosition[0]);
 	glEnable(GL_RASTERIZER_DISCARD);
 
@@ -95,57 +96,150 @@ void GPUParticleEmitter::Draw
 }
 void GPUParticleEmitter::createBuffers() 
 {
-	nsfw::Assets::instance().makeVAO("vao0", particles,m_maxParticles);
-	nsfw::Assets::instance().makeVAO("vao1", particles,m_maxParticles);
-	
 
-	/*
 	glGenVertexArrays(2, m_vao);
 	glGenBuffers(2, m_vbo);
 	// setup the first buffer
 	glBindVertexArray(m_vao[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, m_maxParticles *
-		sizeof(GPUParticle), m_particles, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_maxParticles * sizeof(nsfw::ParticleVertex), particles, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(0); // position
 	glEnableVertexAttribArray(1); // velocity
 	glEnableVertexAttribArray(2); // lifetime
 	glEnableVertexAttribArray(3); // lifespan
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), 0);
+		sizeof(nsfw::ParticleVertex), 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 12);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 12);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 24);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 24);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 28);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 28);
 	// setup the second buffer
 	glBindVertexArray(m_vao[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo[1]);
 	glBufferData(GL_ARRAY_BUFFER, m_maxParticles *
-		sizeof(GPUParticle), 0, GL_STREAM_DRAW);
+		sizeof(nsfw::ParticleVertex), 0, GL_STREAM_DRAW);
 	glEnableVertexAttribArray(0); // position
 	glEnableVertexAttribArray(1); // velocity
 	glEnableVertexAttribArray(2); // lifetime
 	glEnableVertexAttribArray(3); // lifespan
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), 0);
+		sizeof(nsfw::ParticleVertex), 0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 12);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 12);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 24);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 24);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE,
-		sizeof(GPUParticle), ((char*)0) + 28);
+		sizeof(nsfw::ParticleVertex), ((char*)0) + 28);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	*/
 }
-void GPUParticleEmitter::createUpdateShader()
+//void GPUParticleEmitter::createUpdateShader()
+//{
+//	const char *vars[] = { "position","velocity","lifetime","lifespan" };
+//	nsfw::Assets::instance().loadUpdateShader("gpuParticleUpdateShader", "Shaders/gpuUpdateShader.txt", vars, 4);
+//}
+//void GPUParticleEmitter::createDrawShader() 
+//{
+//	nsfw::Assets::instance().loadShader("particleShader", "Shaders/gpuParticleVert.txt", "Shaders/gpuParticleGeom.txt", "Shaders/gpuParticleFrag.txt");
+//}
+
+void GPUParticleEmitter::createDrawShader(const char* gpuParticleVert, const char* gpuParticleGeom, const char* gpuParticleFrag)
 {
-	const char *vars[] = { "position","velocity","lifetime","lifespan" };
-	nsfw::Assets::instance().loadUpdateShader("gpuParticleUpdateShader", "Shaders/gpuUpdateShader.txt", vars, 4);
+	m_drawShader = glCreateProgram();
+
+	std::ifstream vin(gpuParticleVert);
+	std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
+	std::ifstream gin(gpuParticleGeom);
+	std::string gcontents((std::istreambuf_iterator<char>(gin)), std::istreambuf_iterator<char>());
+	std::ifstream fin(gpuParticleFrag);
+	std::string fcontents((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+
+
+	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+	GLuint gShader = glCreateShader(GL_GEOMETRY_SHADER);
+	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	const char *vs = vcontents.c_str();
+	const char *gs = gcontents.c_str();
+	const char *fs = fcontents.c_str();
+
+	glShaderSource(vShader, 1, &vs, 0);
+	glShaderSource(gShader, 1, &gs, 0);
+	glShaderSource(fShader, 1, &fs, 0);
+	glCompileShader(vShader);
+	glCompileShader(gShader);
+	glCompileShader(fShader);
+	glAttachShader(m_drawShader, vShader);
+	glAttachShader(m_drawShader, gShader);
+	glAttachShader(m_drawShader, fShader);
+	glLinkProgram(m_drawShader);
+	glDeleteShader(vShader);
+	glDeleteShader(gShader);
+	glDeleteShader(fShader);
+
+	int success;
+
+	glGetProgramiv(m_drawShader, GL_LINK_STATUS, &success);
+	if (success == GL_FALSE)
+	{
+		int infoLogLength = 0;
+		glGetProgramiv(m_drawShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		char* infoLog = new char[infoLogLength];
+		glGetProgramInfoLog(m_drawShader, infoLogLength, 0, infoLog);
+		printf("Error: Failed to link shader program!\n");
+		printf("%s\n", infoLog);
+		delete[] infoLog;
+
+	}
+
 }
-void GPUParticleEmitter::createDrawShader() 
-{
-	nsfw::Assets::instance().loadShader("particleShader", "Shaders/gpuParticleVert.txt", "Shaders/gpuParticleGeom.txt", "Shaders/gpuParticleFrag.txt");
+
+void GPUParticleEmitter::createUpdateShader(const char * vpath) {
+
+	//File Loading
+	std::ifstream vin(vpath);
+	std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
+
+	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+	const char *vs = vcontents.c_str();
+	glShaderSource(vShader, 1, &vs, 0);
+	glCompileShader(vShader);
+	int success;
+	glGetProgramiv(m_updateShader, GL_LINK_STATUS, &success);
+
+	if (success == GL_FALSE)
+	{
+		int infoLogLength = 0;
+		glGetProgramiv(m_updateShader, GL_INFO_LOG_LENGTH, &infoLogLength);
+		char* infoLog = new char[infoLogLength];
+		glGetProgramInfoLog(m_updateShader, infoLogLength, 0, infoLog);
+		printf("Error: Failed to link shader program!\n");
+		printf("%s\n", infoLog);
+		delete[] infoLog;
+
+	}
+
+	unsigned int uvs = vShader;
+
+	m_updateShader = glCreateProgram();
+	glAttachShader(m_updateShader, vShader);
+
+	//data that will stream back
+	const char* varyings[] = { "position", "velocity","lifetime", "lifespan" };
+	glTransformFeedbackVaryings(m_updateShader, 4, varyings, GL_INTERLEAVED_ATTRIBS);
+	glLinkProgram(m_updateShader);
+
+	glDeleteShader(uvs);
+	glDeleteShader(vShader);
+
+	glUseProgram(m_updateShader);
+
+	//bind lifetime
+	int location = glGetUniformLocation(m_updateShader, "lifeMin");
+	glUniform1f(location, m_lifespanMin);
+	location = glGetUniformLocation(m_updateShader, "lifeMax");
+	glUniform1f(location, m_lifespanMax);
+
 }
