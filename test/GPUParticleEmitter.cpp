@@ -3,6 +3,34 @@
 #include "GPUParticleEmitter.h"
 #include <fstream>
 
+//unsigned int loadShader(unsigned int type, const char* path)
+//{
+//	// loading in the shader source
+//	FILE* file = fopen(path, "rb");
+//	
+//	if (file == nullptr)	// did it work?
+//		return 0; // nope, rage quit
+//
+//	// read through the entire file
+//	fseek(file, 0, SEEK_END);
+//	unsigned int length = ftell(file);
+//	fseek(file, 0, SEEK_SET);
+//
+//	// copy the string into the char array
+//	char* source = new char[length + 1];
+//	memset(source, 0, length + 1);
+//	fread(source, sizeof(char), length, file);
+//	fclose(file);
+//
+//	// create a shader
+//	unsigned int shader = glCreateShader(type);
+//	glShaderSource(shader, 1, &source, 0);
+//	glCompileShader(shader);
+//	delete[] source;
+//
+//	// return the shader
+//	return shader;
+//}
 void GPUParticleEmitter::Init
 	(unsigned int a_maxParticles,
 	 float a_lifespanMin, float a_lifespanMax,
@@ -25,16 +53,16 @@ void GPUParticleEmitter::Init
 	m_lifespanMax = a_lifespanMax;
 
 	m_maxParticles = a_maxParticles;
-	mesh = "Cube";
+	/*mesh = "Cube";
 	tris = "Cube";
-	diffuse = "White";
+	diffuse = "White";*/
 	// create particle array
 	particles = new nsfw::ParticleVertex[a_maxParticles];
 	// set our starting ping-pong buffer
 	m_activeBuffer = 0;
 	createBuffers();
 	createUpdateShader("Shaders/gpuUpdateShader.txt");
-	createDrawShader("Shaders/gpuParticleVert.txt", "Shaders/gpuParticleGeom.txt", "Shaders/gpuParticleFrag.txt");
+	createDrawShader();
 
 }
 
@@ -43,7 +71,7 @@ void GPUParticleEmitter::Draw
 	 const glm::mat4& a_cameraTransform,
 	 const glm::mat4& a_projectionView) 
 {
-	// update the particles using transform feedback
+	// update the partupdateicles using transform feedback
 	glUseProgram(m_updateShader);
 
 
@@ -145,39 +173,70 @@ void GPUParticleEmitter::createBuffers()
 //	nsfw::Assets::instance().loadShader("particleShader", "Shaders/gpuParticleVert.txt", "Shaders/gpuParticleGeom.txt", "Shaders/gpuParticleFrag.txt");
 //}
 
-void GPUParticleEmitter::createDrawShader(const char* gpuParticleVert, const char* gpuParticleGeom, const char* gpuParticleFrag)
+void GPUParticleEmitter::createDrawShader()
 {
+	unsigned int vs = nsfw::Assets::loadSubShader(GL_VERTEX_SHADER,"Shaders/gpuParticleVert.txt");
+	unsigned int gs = nsfw::Assets::loadSubShader(GL_GEOMETRY_SHADER,"Shaders/gpuParticleGeom.txt");
+	unsigned int fs = nsfw::Assets::loadSubShader(GL_FRAGMENT_SHADER,"Shaders/gpuParticleFrag.txt");
 	m_drawShader = glCreateProgram();
-
-	std::ifstream vin(gpuParticleVert);
-	std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
-	std::ifstream gin(gpuParticleGeom);
-	std::string gcontents((std::istreambuf_iterator<char>(gin)), std::istreambuf_iterator<char>());
-	std::ifstream fin(gpuParticleFrag);
-	std::string fcontents((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
-
-
-	GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
-	GLuint gShader = glCreateShader(GL_GEOMETRY_SHADER);
-	GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	const char *vs = vcontents.c_str();
-	const char *gs = gcontents.c_str();
-	const char *fs = fcontents.c_str();
-
-	glShaderSource(vShader, 1, &vs, 0);
-	glShaderSource(gShader, 1, &gs, 0);
-	glShaderSource(fShader, 1, &fs, 0);
-	glCompileShader(vShader);
-	glCompileShader(gShader);
-	glCompileShader(fShader);
-	glAttachShader(m_drawShader, vShader);
-	glAttachShader(m_drawShader, gShader);
-	glAttachShader(m_drawShader, fShader);
+	glAttachShader(m_drawShader, vs);
+	glAttachShader(m_drawShader, fs);
+	glAttachShader(m_drawShader, gs);
 	glLinkProgram(m_drawShader);
-	glDeleteShader(vShader);
-	glDeleteShader(gShader);
-	glDeleteShader(fShader);
+	// remove unneeded handles
+	glDeleteShader(vs);
+	glDeleteShader(gs);
+	glDeleteShader(fs);
+	// bind the shader so that we can set
+	// some uniforms that don't change per-frame
+	glUseProgram(m_drawShader);
+	// bind size information for interpolation that won’t change
+	int location = glGetUniformLocation(m_drawShader, "sizeStart");
+	glUniform1f(location, m_startSize);
+	location = glGetUniformLocation(m_drawShader, "sizeEnd");
+	glUniform1f(location, m_endSize);
+	// bind colour information for interpolation that wont change
+	location = glGetUniformLocation(m_drawShader, "colourStart");
+	glUniform4fv(location, 1, &m_startColour[0]);
+	location = glGetUniformLocation(m_drawShader, "colourEnd");
+	glUniform4fv(location, 1, &m_endColour[0]);
+
+
+
+
+
+
+	//std::ifstream vin(gpuParticleVert);
+	//std::string vcontents((std::istreambuf_iterator<char>(vin)), std::istreambuf_iterator<char>());
+	//std::ifstream gin(gpuParticleGeom);
+	//std::string gcontents((std::istreambuf_iterator<char>(gin)), std::istreambuf_iterator<char>());
+	//std::ifstream fin(gpuParticleFrag);
+	//std::string fcontents((std::istreambuf_iterator<char>(fin)), std::istreambuf_iterator<char>());
+
+
+	//GLuint vShader = glCreateShader(GL_VERTEX_SHADER);
+	//GLuint gShader = glCreateShader(GL_GEOMETRY_SHADER);
+	//GLuint fShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+	//const char *vs = vcontents.c_str();
+	//const char *gs = gcontents.c_str();
+	//const char *fs = fcontents.c_str();
+
+	//m_drawShader = glCreateProgram();
+
+	//glShaderSource(vShader, 1, &vs, 0);
+	//glShaderSource(gShader, 1, &gs, 0);
+	//glShaderSource(fShader, 1, &fs, 0);
+	//glCompileShader(vShader);
+	//glCompileShader(gShader);
+	//glCompileShader(fShader);
+	//glAttachShader(m_drawShader, vShader);
+	//glAttachShader(m_drawShader, gShader);
+	//glAttachShader(m_drawShader, fShader);
+	//glLinkProgram(m_drawShader);
+	//glDeleteShader(vShader);
+	//glDeleteShader(gShader);
+	//glDeleteShader(fShader);
 
 	int success;
 

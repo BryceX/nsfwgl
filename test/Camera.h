@@ -8,10 +8,7 @@ struct Camera
 	float mnear, mfar, maspect, mfov;
 	Camera() :mnear(1), mfar(50), maspect(nsfw::Window::instance().getWidth() / (float)nsfw::Window::instance().getHeight()), mfov(90) {}
 	void update() {}
-	void lookAt(glm::vec3 pos, glm::vec3 target, glm::vec3 up) 
-	{
-		transform = glm::inverse(glm::lookAt(pos, target, up));
-	}
+	void lookAt(glm::vec3 pos, glm::vec3 target, glm::vec3 up) { transform = glm::inverse(glm::lookAt(pos, target, up)); }
 
 	glm::mat4 getView() const
 	{
@@ -22,5 +19,10 @@ struct Camera
 		return glm::perspective(mfov, maspect, mnear, mfar); 
 	}
 
+	/*void Slide(const float hDistance, const float vDistance)
+		{
+		mPosition += glm::vec3(hDistance, vDistance, 0);
+		
+		}*/
 
 };

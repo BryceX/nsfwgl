@@ -1,7 +1,7 @@
 #pragma once
 #include "nsfw.h"
 
-
+unsigned int loadShader(unsigned int type, const char* path);
 class GPUParticleEmitter {
 public:
 	GPUParticleEmitter::GPUParticleEmitter() :
@@ -20,12 +20,13 @@ public:
 	GPUParticleEmitter::~GPUParticleEmitter()
 	{
 
-		//delete[] m_particles;
-		//glDeleteVertexArrays(2, m_vao);
-		//glDeleteBuffers(2, m_vbo);
-		//// delete the shaders
-		//glDeleteProgram(m_drawShader);
-		//glDeleteProgram(m_updateShader);
+		delete[] particles;
+
+		glDeleteVertexArrays(2, m_vao);
+		glDeleteBuffers(2, m_vbo);
+		// delete the shaders
+		glDeleteProgram(m_drawShader);
+		glDeleteProgram(m_updateShader);
 	}
 	/*GPUParticleEmitter();
 	virtual ~GPUParticleEmitter();*/
@@ -40,17 +41,19 @@ public:
 	void Draw(float time, const glm::mat4& a_cameraTransform,
 		const glm::mat4& a_projectionView);
 
-	nsfw::Asset<nsfw::ASSET::VAO> mesh;
+	/*nsfw::Asset<nsfw::ASSET::VAO> mesh;
 	nsfw::Asset<nsfw::ASSET::SIZE> tris;
-	nsfw::Asset<nsfw::ASSET::TEXTURE> diffuse;
+	nsfw::Asset<nsfw::ASSET::TEXTURE> diffuse;*/
 	
+	//nsfw::Asset<nsfw::ASSET::SHADER>DRAWSHADER;
+	//nsfw::Asset<nsfw::ASSET::SHADER>updateshad;
+
 protected:
 
 	
 	void createBuffers();
 	void createUpdateShader(const char * vpath);
-	void createDrawShader(const char* gpuParticleVert, const char* gpuParticleGeom, const char* gpuParticleFrag);
-
+	void createDrawShader();
 
 
 	nsfw::ParticleVertex* particles;

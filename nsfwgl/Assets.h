@@ -126,11 +126,13 @@ namespace nsfw
 		// should load a texture from a file, use makeTexture to alloc, and then copy filedata in
 		bool loadTexture(const char *name, const char *path);
 	
-		unsigned int loadSubShader( unsigned int type, const char* path);
+		// loads a shader to be linked into a shader program
+		static unsigned int loadSubShader( unsigned int type, const char* path);
 
 		// should load a shader from file
 		bool loadShader(const char *name, const char *vpath, const char *fpath);
 		bool loadShader(const char *name, const char *vpath, const char *gpath, const char *fpath);
+		
 		bool loadUpdateShader(const char* name, const char*vpath,  const char* varyings[], int noutputvars);
 		// should load from an FBX, adding assets to the library as they are discovered
 		bool loadFBX(const char *name, const char *path);
@@ -142,5 +144,9 @@ namespace nsfw
 		void init();
 		// clear out all of the opengl handles!
 		void term();
+	private:
+
+		// 
+		//unsigned int loadSingleShader(unsigned int type, const char* path);
 	};
 }

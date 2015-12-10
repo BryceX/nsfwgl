@@ -290,6 +290,7 @@ bool nsfw::Assets::loadTexture(const char * name, const char * path)
 }
 unsigned int nsfw::Assets::loadSubShader(unsigned int type, const char* path)
 {
+	// loading in the shader source
 	std::ifstream in(path);	// opens a inbound-file stream to the file containing the shader source code
 
 	if (!in.is_open())
@@ -304,14 +305,14 @@ unsigned int nsfw::Assets::loadSubShader(unsigned int type, const char* path)
 	// copy the string into the char array
 	strncpy_s(src, sizeof(char)*contents.length() + 1, contents.c_str(), sizeof(char)*contents.length() + 1);
 
-	// generate a blank shader and hold a handle to it so we can access it in the future
+	// create a shader
 	unsigned int shader = glCreateShader(type);
 	glShaderSource(shader, 1, &src, 0);	// supply the source for the shader to the shader
 	glCompileShader(shader);	// attempt to compile the shader
 	delete[] src;	// delete the dynamic char array from the heap. if we don't do this, we'll have a memory leak because we
 					// won't be able to delete this anymore because we won't know where it is
 
-					// return a handle to the shader
+	// return a handle to the shader
 	return shader;
 }
 
@@ -421,6 +422,25 @@ bool nsfw::Assets::loadShader(const char * name, const char *vpath, const char *
 	//TODO_D("Load shader from a file.");
 	return true;
 }
+//unsigned int nsfw::Assets::loadSingleShader(unsigned int type, const char* path) 
+//{
+//	FILE* file = fopen(path, "rb");
+//	if (file == nullptr)
+//		return 0;
+//	// read the shader source
+//	fseek(file, 0, SEEK_END);
+//	unsigned int length = ftell(file);
+//	fseek(file, 0, SEEK_SET);
+//	char* source = new char[length + 1];
+//	memset(source, 0, length + 1);
+//	fread(source, sizeof(char), length, file);
+//	fclose(file);
+//	unsigned int shader = glCreateShader(type);
+//	glShaderSource(shader, 1, &source, 0);
+//	glCompileShader(shader);
+//	delete[] source;
+//	return shader;//
+//}
 
 bool nsfw::Assets::loadUpdateShader(const char * name, const char * vpath, const char* varyings[], int noutputvars)
 {
