@@ -33,18 +33,14 @@ using namespace nsfw;
 
 int main()
 {
-
 	DeferredApplication d;
 
 	d.init(1280,720,"NOT SAFE FOR LIFE");
 	
 	d.play();
 	system("pause");
-	d.term();
-	
-	
+	d.term();	
 }
-
 
 void DeferredApplication::onInit()
 {
@@ -79,9 +75,6 @@ void DeferredApplication::onPlay()
 	//m_geometryPass			= new GPass(); //"GeometryPassPhong", "GeometryPass");
 	//m_directionalLightPass	= new LPassD(); //"LightPassDirectional", "LightPass");
 	//m_compositePass			= new CPass(); //"CompPass", "Screen"); // Screen is defined in nsfw::Assets::init()
-	
-	
-	
 }
 
 void DeferredApplication::onStep()
@@ -95,10 +88,6 @@ void DeferredApplication::onStep()
 	//m_geometryPass->prep();
 	//m_geometryPass->draw(*m_camera, *m_soulspear);
 	//m_geometryPass->post();
-
-	////m_directionalLightPass->prep();
-	////m_directionalLightPass->draw(*m_camera, *m_light);
-	////m_directionalLightPass->post();
 
 	//m_compositePass->prep();
 	//m_compositePass->draw();

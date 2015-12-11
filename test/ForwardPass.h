@@ -14,29 +14,38 @@ class ForwardPass : public nsfw::RenderPass
 public:
 	void prep()
 	{
+		// RENDERING CONTEXT
 		glBindFramebuffer(GL_FRAMEBUFFER, *fbo);
 		glViewport(0, 0, 1280, 720);
 
+		// GL FLAGS
 		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_CULL_FACE);
 
+		//
 		glClearColor(0.25f, 0.25f, 0.25f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		
+		// pipeline
+		glUseProgram(*shader);
 	}
 
 	void post()
 	{
+		// RENDERING CONTEXT
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
+		// GL FLAGS
 		glDisable(GL_DEPTH_TEST);
 		//glDisable(GL_CULL_FACE);
+		
+		// pipeline
 		glUseProgram(0);
 	}
 
 	void draw(const Camera &c, const GameObject &go, const Light &dl)
 	{
-		glUseProgram(*shader);
+		
 		glm::mat4 clipToUV = glm::scale(.5f, .5f, .5f);
 		//// first, scale it down by half in all components (xyz)
 		clipToUV = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));

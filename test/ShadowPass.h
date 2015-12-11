@@ -32,20 +32,24 @@ public:
 	{
 		auto &window = nsfw::Window::instance();
 
+		// RENDERING WINDOW
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glViewport(0, 0, window.getWidth(),window.getHeight());
-		glUseProgram(0);
-
+		
+		// GL FLAGS
 		glDisable(GL_DEPTH_TEST);
 		//glDisable(GL_CULL_FACE);
+
+		// pipeline
+		glUseProgram(0);
 	}
 
 	void draw(const GameObject &go, Light &dl)
 	{
-			setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(dl.getProjection()*dl.getView()));
-			setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
+		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(dl.getProjection()*dl.getView()));
+		setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
 
-			glBindVertexArray(*go.mesh);
-			glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
+		glBindVertexArray(*go.mesh);
+		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
 	}
 };

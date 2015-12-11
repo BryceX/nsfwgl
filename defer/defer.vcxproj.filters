@@ -27,6 +27,12 @@
     <ClCompile Include="GPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CPass.h">

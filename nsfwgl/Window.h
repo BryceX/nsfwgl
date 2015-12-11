@@ -36,9 +36,8 @@ namespace nsfw
 		void term();
 		float deltaTime = 0;
 		float timePassed = 0;
+		
 		// just wrap what GLFW already does
-
-		void	  SetTime();
 		bool	  getKey(GLFWwindow* window, unsigned int k);
 		bool	  getShouldClose()           ;
 		unsigned  getWidth()                 const;

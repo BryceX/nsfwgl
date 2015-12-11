@@ -125,7 +125,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GPUParticleEmitter.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
-    <ClCompile Include="Source.cpp">
+    <ClCompile Include="main.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)nsfwgl;$(SolutionDir)dep\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile Include="testApp.cpp" />

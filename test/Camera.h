@@ -33,24 +33,23 @@ struct Camera
 
 	void MovePan(  unsigned int up,unsigned int down,unsigned int left,unsigned int right)
 	{
+		auto& window = nsfw::Window::instance();
 		
-		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, up))
+		if (window.getKey(window.window, up))
 		{
-			transform[3].y += 1*nsfw::Window::instance().deltaTime;
+			transform[3].y += 1* window.deltaTime;
 		}
-		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, down))
+		if (window.getKey(window.window, down))
 		{
-			transform[3].y -= 1*nsfw::Window::instance().deltaTime;
+			transform[3].y -= 1* window.deltaTime;
 		}
-		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, left))
+		if (window.getKey(window.window, left))
 		{
-			transform[3].x -= 1*nsfw::Window::instance().deltaTime;
+			transform[3].x -= 1* window.deltaTime;
 		}
-		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, right))
+		if (window.getKey(window.window, right))
 		{
-			transform[3].x += 1*nsfw::Window::instance().deltaTime;
+			transform[3].x += 1* window.deltaTime;
 		}
-
 	}
-
 };

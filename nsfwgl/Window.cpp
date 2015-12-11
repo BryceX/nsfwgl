@@ -29,9 +29,11 @@ void nsfw::Window::init(unsigned width, unsigned height)
 
 void nsfw::Window::step()
 {
+	deltaTime = glfwGetTime() - timePassed;
+	timePassed = glfwGetTime();
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();	
+	glfwSwapBuffers(window);
+	glfwPollEvents();	
 }
 
 void nsfw::Window::term()
@@ -40,12 +42,6 @@ void nsfw::Window::term()
 	glfwTerminate();
 	glfwDestroyWindow(window);
 	//TODO();
-}
-
-void nsfw::Window::SetTime() 
-{
-	deltaTime = glfwGetTime() - timePassed;	
-	timePassed = glfwGetTime();
 }
 
 bool nsfw::Window::getKey(GLFWwindow* window, unsigned int k) 
