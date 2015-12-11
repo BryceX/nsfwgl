@@ -439,7 +439,8 @@ bool nsfw::Assets::loadShader(const char * name, const char *vpath, const char *
 //	glShaderSource(shader, 1, &source, 0);
 //	glCompileShader(shader);
 //	delete[] source;
-//	return shader;//
+//	return shader;
+//
 //}
 
 bool nsfw::Assets::loadUpdateShader(const char * name, const char * vpath, const char* varyings[], int noutputvars)

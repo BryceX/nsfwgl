@@ -19,7 +19,7 @@ void main()
 {
 
 	vTexCoord   = TexCoord;
-	vNormal     = Model * Normal;
+	vNormal     = View * Model * Normal;
     
 	// transformed into shadow space!
 	vShadowCoord = LightMatrix * Model * Position;

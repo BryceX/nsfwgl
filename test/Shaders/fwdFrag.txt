@@ -14,24 +14,26 @@ uniform sampler2D ShadowMap;
 
 uniform float ShadowBias;
 
-uniform vec4 LightColor;
-uniform vec4 LightDirection;
+uniform vec4 LightColor = vec4( 1.0, 1.0, 1.0, 1.0 );
+uniform vec4 LightDirection; // remember to convewrt to world space
+
+uniform mat4 Projection;	// camera's projection matrix (how the world is percieved)
+uniform mat4 View;			// camera's view matrix (where it's looking at)
+uniform mat4 Model;			// model matrix -- this is your transform
 
 void main()
 {	
    vec4 ObjectColor = texture(Diffuse, vTexCoord);
+   vec4 lightDir = View * LightDirection;
    
-   float d = max(0,dot(vNormal, LightDirection));
+   float d = max(0,dot(vNormal, lightDir));
    
 	// use shadowMap to determine if something is lit or not
 	// if it isn't lit, then d = 0
 	
-	if	(texture(ShadowMap, vShadowCoord.xy).r < vShadowCoord.z - 0.01)
-	{
-		d = 0;
+	if (texture(ShadowMap, vShadowCoord.xy).r < vShadowCoord.z - 0.01) {
+        d = 0;
 	}
    
-   //FragColor = ObjectColor * d * LightColor;
-   FragColor = vec4(1);
-   //FragColor = vec4(d,d,d,1);
+   FragColor = ObjectColor * d * LightColor;
 }

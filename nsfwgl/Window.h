@@ -17,12 +17,13 @@ namespace nsfw
 {
 	class Window
 	{
-		GLFWwindow *window;
 		
+	
+	public:
+		GLFWwindow *window;
 		unsigned width, height;		// keep track of width height- needed for glViewport FBO integration
 
-		Window():window(nullptr),width(0),height(0) {}
-	public:
+		Window() :window(nullptr), width(0), height(0) {}
 		static Window &instance() { static Window w; return w; }
 		
 		//create the context!
@@ -36,6 +37,7 @@ namespace nsfw
 		float deltaTime = 0;
 		float timePassed = 0;
 		// just wrap what GLFW already does
+
 		void	  SetTime();
 		bool	  getKey(GLFWwindow* window, unsigned int k);
 		bool	  getShouldClose()           ;

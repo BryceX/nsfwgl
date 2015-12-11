@@ -44,9 +44,8 @@ public:
 	{
 			setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(dl.getProjection()*dl.getView()));
 			setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
+
 			glBindVertexArray(*go.mesh);
 			glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);
 	}
-
-
 };
