@@ -110,8 +110,13 @@ void TestApp::onInit()
 
 	
 	nsfw::Assets::instance().loadFBX("Spear", "../FBX/soulspear/soulspear.fbx");
-	nsfw::Assets::instance().loadTexture("Spear", "../FBX/soulspear/soulspear_diffuse.tga");
+	nsfw::Assets::instance().loadTexture("SpearDiffuse", "../FBX/soulspear/soulspear_diffuse.tga");
+	nsfw::Assets::instance().loadTexture("SpearNormal", "../FBX/soulSpear/soulspear_normal.tga");
+	nsfw::Assets::instance().loadTexture("RockFloorDiffuse", "../textures/rock_diffuse.tga");
+	nsfw::Assets::instance().loadTexture("RockFloorNormal", "../textures/rock_normal.tga");
 	////nsfw::Assets::instance().loadOBJ("Bunny", "../OBJ/bunny.obj");
+
+
 
 //	nsfw::Assets::instance().loadTexture("Purple", "../resources/textures/purple.png");
 }
@@ -120,12 +125,13 @@ void TestApp::onPlay()
 {
 	// initialize my scene objects
 	camera.maspect = nsfw::Window::instance().getWidth() / (float)nsfw::Window::instance().getHeight();
-	camera.lookAt(glm::vec3(10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera.lookAt(glm::vec3(0, 0, 6), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	
 	// initialize my gameObject
 	gameObject.transform = glm::mat4(1);
-	gameObject.diffuse   = "Spear";
+	gameObject.diffuse   = "SpearDiffuse";
+	gameObject.normalMap = "SpearNormal";
 	gameObject.mesh		 = "Spear";
 	gameObject.tris		 = "Spear";
 
@@ -135,7 +141,8 @@ void TestApp::onPlay()
 	gameObject1.tris	 = "Spear";*/
 
 	floor.transform =  glm::translate(0.f,0.0f,0.f) * glm::rotate(-90.f,vec3(1.f,0.f,0.f))  * glm::scale(10.f, 10.f, 1.f);
-	floor.diffuse = "White";
+	floor.diffuse = "RockFloorDiffuse";
+	floor.normalMap = "RockFloorNormal";
 	floor.mesh = "Quad";
 	floor.tris = "Quad";
 

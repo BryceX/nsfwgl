@@ -3,15 +3,16 @@
 // geometry
 in vec2 vTexCoord;
 in vec4 vNormal;
+in vec3 vTangent;
+in vec3 vBiTangent;
 
 // shadows
 in vec4 vShadowCoord;
-
 out vec4 FragColor;
 
-uniform sampler2D Diffuse;
+uniform sampler2D DiffuseMap;
 uniform sampler2D ShadowMap;
-
+uniform sampler2D NormalMap;
 uniform float ShadowBias;
 
 uniform vec4 LightColor = vec4( 1.0, 1.0, 1.0, 1.0 );
@@ -22,18 +23,24 @@ uniform mat4 View;			// camera's view matrix (where it's looking at)
 uniform mat4 Model;			// model matrix -- this is your transform
 
 void main()
-{	
-   vec4 ObjectColor = texture(Diffuse, vTexCoord);
-   vec4 lightDir = View * LightDirection;
-   
-   float d = max(0,dot(vNormal, lightDir));
+{
+   mat3 TBN = mat3(normalize(vTangent),
+				   normalize(vBiTangent),
+				   normalize(vNormal));	
+				   
+   vec4 ObjectColor = texture(DiffuseMap, vTexCoord);
+   vec4 LightDir = View * LightDirection;
+   vec3 N = texture(NormalMap, vTexCoord).xyz * 2 - 1;
+   float d = max(0,dot(normalize(TBN * N), normalize (LightDir).xyz));
    
 	// use shadowMap to determine if something is lit or not
 	// if it isn't lit, then d = 0
 	
-	if (texture(ShadowMap, vShadowCoord.xy).r < vShadowCoord.z - 0.01) {
+	if (texture(ShadowMap, vShadowCoord.xy).r < vShadowCoord.z - 0.01) 
+	{
         d = 0;
 	}
    
    FragColor = ObjectColor * d * LightColor;
+   
 }

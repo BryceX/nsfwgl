@@ -48,10 +48,16 @@ public:
 		////GameObject
 		setUniform("Model", nsfw::UNIFORM::MAT4, glm::value_ptr(go.transform));
 
-		setUniform("Diffuse", nsfw::UNIFORM::TEX2, go.diffuse, 0);
+		setUniform("DiffuseMap",	nsfw::UNIFORM::TEX2, go.diffuse, 0);
+		setUniform("NormalMap",		nsfw::UNIFORM::TEX2, go.normalMap, 1);
+
+		// HACK: hard coding value for ShadowMap texture
+		nsfw::Asset<nsfw::ASSET::TEXTURE> shadowmap = "ShadowMap";
+		setUniform("ShadowMap",		nsfw::UNIFORM::TEX2, shadowmap, 2);
+
 		//Light
 		//setUniform("LightColor", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.color) );
-		setUniform("LightDirection", nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction));
+		setUniform("LightDirection",nsfw::UNIFORM::FLO4, glm::value_ptr(dl.direction));
 
 		/*
 		* DON'T TOUCH THIS
@@ -68,9 +74,7 @@ public:
 
 		setUniform("LightMatrix", nsfw::UNIFORM::MAT4, glm::value_ptr(texSpaceOffset * dl.getProjection() * dl.getView()));
 
-		// HACK: hard coding value for ShadowMap texture
-		nsfw::Asset<nsfw::ASSET::TEXTURE> shadowmap = "ShadowMap";
-		setUniform("ShadowMap", nsfw::UNIFORM::TEX2, shadowmap, 1);
+
 
 		glBindVertexArray(*go.mesh);
 		glDrawElements(GL_TRIANGLES, *go.tris, GL_UNSIGNED_INT, 0);

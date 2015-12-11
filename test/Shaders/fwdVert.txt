@@ -7,6 +7,8 @@ layout(location = 3)in vec2 TexCoord;
 
 out vec2 vTexCoord;	// v ... for VERTEX! (not vendetta)
 out vec4 vNormal;
+out vec3 vTangent;
+out vec3 vBiTangent;
 out vec4 vShadowCoord;
 
 uniform mat4 Projection;	// camera's projection matrix (how the world is percieved)
@@ -20,6 +22,8 @@ void main()
 
 	vTexCoord   = TexCoord;
 	vNormal     = View * Model * Normal;
+	vTangent = Tangent.xyz;
+	vBiTangent = cross(vNormal.xyz, vTangent).xyz;
     
 	// transformed into shadow space!
 	vShadowCoord = LightMatrix * Model * Position;

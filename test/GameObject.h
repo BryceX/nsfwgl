@@ -9,4 +9,5 @@ struct GameObject
 	nsfw::Asset<nsfw::ASSET::VAO> mesh;
 	nsfw::Asset<nsfw::ASSET::SIZE> tris;
 	nsfw::Asset<nsfw::ASSET::TEXTURE> diffuse;
+	nsfw::Asset<nsfw::ASSET::TEXTURE> normalMap;
 };

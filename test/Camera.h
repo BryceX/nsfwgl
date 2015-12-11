@@ -36,20 +36,19 @@ struct Camera
 		
 		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, up))
 		{
-			std::cout << "slkdjlksajf" << std::endl;
-			transform[3].y += 1;
+			transform[3].y += 1*nsfw::Window::instance().deltaTime;
 		}
 		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, down))
 		{
-			transform[3].y -= 1;
+			transform[3].y -= 1*nsfw::Window::instance().deltaTime;
 		}
 		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, left))
 		{
-			transform[3].x -= 1;
+			transform[3].x -= 1*nsfw::Window::instance().deltaTime;
 		}
 		if (nsfw::Window::instance().getKey(nsfw::Window::instance().window, right))
 		{
-			transform[3].x += 1;
+			transform[3].x += 1*nsfw::Window::instance().deltaTime;
 		}
 
 	}
